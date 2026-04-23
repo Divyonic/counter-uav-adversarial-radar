@@ -1,0 +1,30 @@
+Generating comparison data (50 samples per class at SNR=15dB)...
+
+================================================================================
+FEATURE COMPARISON REPORT: BFP vs HERM
+================================================================================
+
+--- Autocorrelation-based BFP ---
+Class                   f_bfp         c_bfp        df_bfp
+Drone               18.20±40.62      0.04±0.09      0.00±0.00  
+Bird                30.88±48.26      0.06±0.09      0.00±0.00  
+Fixed-wing UAV      37.10±56.12      0.08±0.12      0.00±0.00  
+Aircraft            67.83±26.56      0.29±0.12      0.01±0.00  
+
+--- HERM harmonic-product-spectrum ---
+Class                  f_fund           hnr       entropy        n_harm     harm_frac
+Drone               10.50±9.73      0.24±0.10      3.65±0.73      4.00±0.00      0.29±0.13  
+Bird                10.95±11.10      0.22±0.11      3.79±0.83      4.00±0.00      0.26±0.14  
+Fixed-wing UAV      12.69±10.13      0.17±0.09      4.02±0.74      4.00±0.00      0.18±0.10  
+Aircraft            12.36±8.98      0.13±0.04      4.30±0.34      4.00±0.00      0.13±0.04  
+
+--- Class separability (Fisher ratio: between/within variance) ---
+Higher = more discriminative feature
+  BFP  f_bfp     : Fisher = 0.1701
+  BFP  c_bfp     : Fisher = 0.8909
+  BFP  df_bfp    : Fisher = 0.5917
+  HERM f_fund    : Fisher = 0.0085
+  HERM hnr       : Fisher = 0.2243
+  HERM entropy   : Fisher = 0.1289
+  HERM n_harm    : Fisher = 0.0000
+  HERM harm_frac : Fisher = 0.2943
