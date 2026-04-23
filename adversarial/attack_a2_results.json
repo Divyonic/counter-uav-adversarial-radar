@@ -1,0 +1,107 @@
+{
+  "baseline_clean_test_accuracy": 0.8888888888888888,
+  "attacks": [
+    {
+      "attack_name": "clean_drone_control",
+      "n_blades": 2,
+      "rpm": 5000,
+      "expected_bfp_hz": 166.66666666666666,
+      "measured_bfp_hz_mean": 45.138404846191406,
+      "measured_bfp_hz_std": 59.478759765625,
+      "bfp_confidence_mean": 0.08831305056810379,
+      "n_samples": 100,
+      "accuracy_as_drone": 0.82,
+      "class_distribution": {
+        "Enemy Drone": 82,
+        "Bird": 16,
+        "Friendly UAV": 2,
+        "Manned Aircraft": 0
+      }
+    },
+    {
+      "attack_name": "A2_pure_1blade",
+      "n_blades": 1,
+      "rpm": 5000,
+      "expected_bfp_hz": 83.33333333333333,
+      "measured_bfp_hz_mean": 35.024959564208984,
+      "measured_bfp_hz_std": 52.211238861083984,
+      "bfp_confidence_mean": 0.09290964901447296,
+      "n_samples": 100,
+      "accuracy_as_drone": 0.87,
+      "class_distribution": {
+        "Enemy Drone": 87,
+        "Bird": 11,
+        "Friendly UAV": 2,
+        "Manned Aircraft": 0
+      }
+    },
+    {
+      "attack_name": "A2+A1_mild",
+      "n_blades": 1,
+      "rpm": 3000,
+      "expected_bfp_hz": 50.0,
+      "measured_bfp_hz_mean": 41.99237060546875,
+      "measured_bfp_hz_std": 53.55527114868164,
+      "bfp_confidence_mean": 0.09256933629512787,
+      "n_samples": 100,
+      "accuracy_as_drone": 0.91,
+      "class_distribution": {
+        "Enemy Drone": 91,
+        "Bird": 0,
+        "Friendly UAV": 6,
+        "Manned Aircraft": 3
+      }
+    },
+    {
+      "attack_name": "A2+A1_aggressive",
+      "n_blades": 1,
+      "rpm": 2000,
+      "expected_bfp_hz": 33.333333333333336,
+      "measured_bfp_hz_mean": 32.08098602294922,
+      "measured_bfp_hz_std": 54.30588150024414,
+      "bfp_confidence_mean": 0.06643660366535187,
+      "n_samples": 100,
+      "accuracy_as_drone": 0.79,
+      "class_distribution": {
+        "Enemy Drone": 79,
+        "Bird": 11,
+        "Friendly UAV": 8,
+        "Manned Aircraft": 2
+      }
+    },
+    {
+      "attack_name": "A2+A1_extreme",
+      "n_blades": 1,
+      "rpm": 1200,
+      "expected_bfp_hz": 20.0,
+      "measured_bfp_hz_mean": 33.59187698364258,
+      "measured_bfp_hz_std": 57.583133697509766,
+      "bfp_confidence_mean": 0.06249922513961792,
+      "n_samples": 100,
+      "accuracy_as_drone": 0.89,
+      "class_distribution": {
+        "Enemy Drone": 89,
+        "Bird": 11,
+        "Friendly UAV": 0,
+        "Manned Aircraft": 0
+      }
+    },
+    {
+      "attack_name": "A2+A1_bird_mimic",
+      "n_blades": 1,
+      "rpm": 800,
+      "expected_bfp_hz": 13.333333333333334,
+      "measured_bfp_hz_mean": 45.116920471191406,
+      "measured_bfp_hz_std": 58.86814498901367,
+      "bfp_confidence_mean": 0.09413525462150574,
+      "n_samples": 100,
+      "accuracy_as_drone": 0.85,
+      "class_distribution": {
+        "Enemy Drone": 85,
+        "Bird": 13,
+        "Friendly UAV": 2,
+        "Manned Aircraft": 0
+      }
+    }
+  ]
+}

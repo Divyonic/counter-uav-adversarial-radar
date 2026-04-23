@@ -25,8 +25,11 @@ from fmcw_simulation import (generate_drone_signal, compute_spectrogram,
 from model import CNNLSTMClassifier
 from train_and_evaluate import train_cnn_lstm_model, create_sequences, CLASS_NAMES
 
-np.random.seed(42)
-torch.manual_seed(42)
+SEED = int(os.environ.get('ATTACK_SEED', '42'))
+N_ATTACK_SAMPLES = int(os.environ.get('ATTACK_N_SAMPLES', '100'))
+np.random.seed(SEED)
+torch.manual_seed(SEED)
+print(f"(seed={SEED}, n_attack_samples={N_ATTACK_SAMPLES})")
 
 DEVICE = 'cpu'
 RESULTS_DIR = os.path.join(os.path.dirname(__file__), 'results')
@@ -173,7 +176,7 @@ def main():
 
     for name, n_blades, rpm in attacks:
         print(f"\n  Running {name}: n_blades={n_blades}, rpm={rpm}...")
-        r = run_attack(model, name, n_blades, rpm, n_samples=100)
+        r = run_attack(model, name, n_blades, rpm, n_samples=N_ATTACK_SAMPLES)
         results['attacks'].append(r)
         print(f"    Expected BFP: {r['expected_bfp_hz']:.1f} Hz | "
               f"Measured: {r['measured_bfp_hz_mean']:.1f} ± {r['measured_bfp_hz_std']:.1f}")
