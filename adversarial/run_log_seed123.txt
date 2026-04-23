@@ -1,0 +1,65 @@
+(seed=123, n_attack_samples=200)
+======================================================================
+STEP 1: Generating clean 4-class dataset @ SNR=15dB
+======================================================================
+Generating dataset: 300 samples/class, SNR=15 dB
+  Generating Enemy Drone... done
+  Generating Bird... done
+  Generating Friendly UAV... done
+  Generating Manned Aircraft... done
+Dataset: 1200 samples
+Train sequences: 804, Val: 144, Test: 144
+
+Training CNN+LSTM+BFP baseline...
+    Epoch 10: loss=0.1232, val_acc=0.8403
+    Early stopping at epoch 19
+Best val accuracy: 0.9167
+Clean-test accuracy: 0.8611
+
+======================================================================
+STEP 2: Running A2 attack variants
+======================================================================
+
+  Running clean_drone_control: n_blades=2, rpm=5000...
+    Expected BFP: 166.7 Hz | Measured: 44.4 ± 61.8
+    Accuracy (correct as drone): 0.780
+    Class distribution: {'Enemy Drone': 156, 'Bird': 32, 'Friendly UAV': 12, 'Manned Aircraft': 0}
+
+  Running A2_pure_1blade: n_blades=1, rpm=5000...
+    Expected BFP: 83.3 Hz | Measured: 40.8 ± 56.1
+    Accuracy (correct as drone): 0.810
+    Class distribution: {'Enemy Drone': 162, 'Bird': 11, 'Friendly UAV': 25, 'Manned Aircraft': 2}
+
+  Running A2+A1_mild: n_blades=1, rpm=3000...
+    Expected BFP: 50.0 Hz | Measured: 38.4 ± 56.6
+    Accuracy (correct as drone): 0.815
+    Class distribution: {'Enemy Drone': 163, 'Bird': 8, 'Friendly UAV': 29, 'Manned Aircraft': 0}
+
+  Running A2+A1_aggressive: n_blades=1, rpm=2000...
+    Expected BFP: 33.3 Hz | Measured: 35.5 ± 50.7
+    Accuracy (correct as drone): 0.855
+    Class distribution: {'Enemy Drone': 171, 'Bird': 11, 'Friendly UAV': 18, 'Manned Aircraft': 0}
+
+  Running A2+A1_extreme: n_blades=1, rpm=1200...
+    Expected BFP: 20.0 Hz | Measured: 42.3 ± 55.6
+    Accuracy (correct as drone): 0.825
+    Class distribution: {'Enemy Drone': 165, 'Bird': 28, 'Friendly UAV': 7, 'Manned Aircraft': 0}
+
+  Running A2+A1_bird_mimic: n_blades=1, rpm=800...
+    Expected BFP: 13.3 Hz | Measured: 32.0 ± 49.1
+    Accuracy (correct as drone): 0.850
+    Class distribution: {'Enemy Drone': 170, 'Bird': 17, 'Friendly UAV': 13, 'Manned Aircraft': 0}
+
+Results saved to /Users/drexonindustries/experiments/counter_uav/results/attack_a2_results.json
+
+======================================================================
+SUMMARY
+======================================================================
+Attack                    BFP (Hz)     Accuracy     Dominant class           
+--------------------------------------------------------------------------
+clean_drone_control       44.4         0.780        Enemy Drone (156)
+A2_pure_1blade            40.8         0.810        Enemy Drone (162)
+A2+A1_mild                38.4         0.815        Enemy Drone (163)
+A2+A1_aggressive          35.5         0.855        Enemy Drone (171)
+A2+A1_extreme             42.3         0.825        Enemy Drone (165)
+A2+A1_bird_mimic          32.0         0.850        Enemy Drone (170)
