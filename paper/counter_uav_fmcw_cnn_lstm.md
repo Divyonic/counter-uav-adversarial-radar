@@ -62,7 +62,7 @@ The specific contributions of this work are:
 
 ### 1.5 Paper Organisation
 
-The remainder of this paper is organised as follows: Section 2 reviews related work. Section 3 details the system architecture. Section 4 describes the signal processing methodology. Section 5 presents the deep learning model architecture. Section 6 covers experimental setup and results. Section 7 discusses operational implications for Indian defence. Section 8 concludes with future directions.
+The remainder of this paper is organised as follows: Section 2 reviews related work. Section 3 details the system architecture. Section 4 describes the signal processing methodology. Section 5 presents the deep learning model architecture. Section 6 covers experimental setup and results. Section 7 discusses the operational context. Section 8 presents strengths, limitations, and future work. Section 9 describes the adversarial-robustness research direction that extends this work, with a threat taxonomy and a first implemented attack. Section 10 concludes.
 
 ---
 
@@ -602,11 +602,73 @@ Several limitations must be acknowledged:
 - **Transfer learning** to adapt the model to new drone types with minimal re-training.
 - **Swarm detection** extending the architecture for simultaneous classification and tracking of multiple drones.
 - **Federated learning** enabling distributed model updates across networked radar nodes without centralising sensitive operational data.
-- **Adversarial robustness** testing and integration of certified defence mechanisms.
+- **Adversarial robustness** — characterised as the primary extension of this work; see Section 9.
 
 ---
 
-## 9. Conclusion
+## 9. Research Direction: Adversarial Robustness of Micro-Doppler Classifiers
+
+### 9.1 Motivation
+
+The baseline system described above demonstrates that multi-frame CNN+LSTM classification can reach 95.8% accuracy on cooperative multi-class target data — where "cooperative" means the drone, bird, and aircraft behave as expected and their micro-Doppler signatures fall within the distribution the classifier was trained on. The leakage test in Section 6 strengthens this finding by showing the accuracy gain derives from multi-instance evidence aggregation across parameter-diverse frames, not from a narrow dependency on intra-sequence parameter consistency.
+
+However, the same result exposes a structural vulnerability: **the classifier's accuracy depends on the target producing a micro-Doppler signature that falls within its training distribution.** A motivated adversary can cheaply modify a drone to produce signatures that violate this assumption. Since every published counter-UAV micro-Doppler classifier — and, to the best of our knowledge, every fielded Indian counter-UAS system including SAKSHAM [5], IDD&IS Mark-2 [6], and commercial alternatives — rests on similar assumptions about target behaviour, this vulnerability is systemic rather than specific to our architecture.
+
+### 9.2 Threat Taxonomy
+
+We propose a taxonomy of low-cost physical adversarial attacks against micro-Doppler classifiers, organised by the pipeline stage they target:
+
+| ID  | Attack                                        | Est. cost    | Targeted stage        | Mechanism                                                                 |
+|-----|-----------------------------------------------|--------------|-----------------------|---------------------------------------------------------------------------|
+| A1  | Lower propeller RPM                           | ₹0           | BFP feature           | Shifts blade-flash frequency toward bird range                            |
+| A2  | Fewer blades per propeller (1-blade)          | ₹500         | BFP feature           | Halves BFP frequency; combined with A1 pushes into bird range             |
+| A3  | Dielectric-coated propellers                  | ₹100         | BFP amplitude         | Reduces blade-flash amplitude below detection threshold                   |
+| A5  | Contra-rotating coaxial propellers            | ₹5,000       | Micro-Doppler spec.   | Net micro-Doppler cancels                                                 |
+| A6  | Ducted-fan airframe                           | ₹30,000      | Line-of-sight         | Physically blocks blade-flash                                             |
+| B1  | Radar-absorbing material wrap                 | ₹2,000       | Bulk RCS              | Reduces target RCS 10–20 dB                                               |
+| B3  | Corner-reflector decoy                        | ₹50 each     | CFAR detection        | Masks true micro-Doppler with large false echo                            |
+| B4  | Chaff dispenser                               | ₹600/use     | CFAR detection        | Generates hundreds of false detections                                    |
+| C1  | Broadband noise jammer                        | ₹3,000       | SNR                   | Drops effective SNR below reliable detection                              |
+| C2  | DRFM ghost-target generator                   | ₹15,000      | Range-Doppler map     | Creates fake drones at false ranges                                       |
+| C4  | Deceptive micro-Doppler injection             | ₹25,000      | Spectrogram           | Broadcasts synthetic bird micro-Doppler from a drone                      |
+| D1  | Bird-mimicking flight pattern                 | ₹0           | LSTM temporal         | Drifts LSTM features toward bird trajectory                               |
+| D2  | Pulse-and-glide flight                        | ₹0           | LSTM temporal         | Most frames capture zero micro-Doppler                                    |
+| E1  | Flapping-wing ornithopter                     | ₹15,000      | Radar-only premise    | Indistinguishable from a bird to micro-Doppler                            |
+
+Attacks in groups A–C target the signal-processing and feature-extraction layers; D attacks target the temporal model; E attacks target the premise that radar alone can perform reliable classification and can only be countered by multi-sensor fusion.
+
+### 9.3 First Implemented Attack: A2 (Fewer-Blade Drones)
+
+The first attack implemented against the baseline classifier is **A2: fewer-blade propellers**. The training data uses 2-blade propellers at 4000–6000 RPM, producing blade-flash-periodicity (BFP) frequencies of approximately 133–200 Hz. An attacker can substitute 1-blade counterweighted propellers and progressively lower the RPM to shift the BFP signature:
+
+| Variant               | n_blades | RPM  | Expected BFP | Expected class (bird range: 2–20 Hz)   |
+|-----------------------|----------|------|--------------|----------------------------------------|
+| clean_drone_control   | 2        | 5000 | 167 Hz       | Drone (baseline sanity check)          |
+| A2_pure_1blade        | 1        | 5000 | 83 Hz        | Drone range edge                       |
+| A2+A1_mild            | 1        | 3000 | 50 Hz        | Drone range edge                       |
+| A2+A1_aggressive      | 1        | 2000 | 33 Hz        | Between drone and bird range           |
+| A2+A1_extreme         | 1        | 1200 | 20 Hz        | Bird range                             |
+| A2+A1_bird_mimic      | 1        | 800  | 13 Hz        | Bird range (small-bird flap typical)   |
+
+Implementation is available at `adversarial/attack_a2_fewer_blades.py`. Quantitative results will be reported in a follow-up.
+
+### 9.4 Proposed Deliverables
+
+The adversarial-robustness programme aims to produce:
+
+1. **Attack implementations** — reproducible simulation code for each attack in the taxonomy, operating on the same FMCW pipeline as the baseline.
+2. **Cost–effectiveness curve** — for each attack, the measured accuracy drop as a function of attacker cost.
+3. **Defence evaluation** — measured effect of adversarial training, multi-sensor fusion, and out-of-distribution detection on classifier robustness.
+4. **Threat model** — a document characterising the adversarial landscape specifically for Indian counter-UAS procurement and evaluation.
+5. **Open-source tool** — a standard robustness benchmark that future counter-UAV classifiers can be evaluated against.
+
+### 9.5 Framing Statement
+
+The contribution of this direction is not a new classifier but a new evaluation standard. We claim that accuracy under cooperative conditions is a necessary but insufficient criterion for counter-UAV classifiers, and that adversarial robustness must become part of the published metric set for any system intended for operational deployment.
+
+---
+
+## 10. Conclusion
 
 This paper presented an AI-powered counter-UAV system that integrates FMCW radar signal processing with a hybrid CNN+LSTM deep learning architecture for automated drone detection, classification, and tracking. The system addresses the critical challenge of distinguishing small UAVs from birds and other airborne targets in cluttered environments - a problem of direct operational relevance to Indian border defence and airbase protection.
 
