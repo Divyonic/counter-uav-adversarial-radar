@@ -2,8 +2,7 @@
 
 ---
 
-**Authors:** [Author Name(s) — to be filled before submission]
-**Affiliation:** [Department, Institution — to be filled before submission]
+**Authors:** Divya Kumar Patel
 **Date:** April 2026
 
 ---
