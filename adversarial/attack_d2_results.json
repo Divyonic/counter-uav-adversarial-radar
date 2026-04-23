@@ -1,0 +1,131 @@
+{
+  "baseline_clean_test_accuracy": 0.8888888888888888,
+  "attacks": [
+    {
+      "attack_name": "D2_glide_0pct",
+      "glide_ratio": 0.0,
+      "n_pulse_frames": 10,
+      "n_glide_frames": 0,
+      "n_samples": 150,
+      "accuracy_as_drone": 0.8333333333333334,
+      "class_distribution": {
+        "Enemy Drone": 125,
+        "Bird": 17,
+        "Friendly UAV": 6,
+        "Manned Aircraft": 2
+      }
+    },
+    {
+      "attack_name": "D2_glide_20pct",
+      "glide_ratio": 0.2,
+      "n_pulse_frames": 8,
+      "n_glide_frames": 2,
+      "n_samples": 150,
+      "accuracy_as_drone": 0.84,
+      "class_distribution": {
+        "Enemy Drone": 126,
+        "Bird": 18,
+        "Friendly UAV": 4,
+        "Manned Aircraft": 2
+      }
+    },
+    {
+      "attack_name": "D2_glide_40pct",
+      "glide_ratio": 0.4,
+      "n_pulse_frames": 6,
+      "n_glide_frames": 4,
+      "n_samples": 150,
+      "accuracy_as_drone": 0.8466666666666667,
+      "class_distribution": {
+        "Enemy Drone": 127,
+        "Bird": 14,
+        "Friendly UAV": 8,
+        "Manned Aircraft": 1
+      }
+    },
+    {
+      "attack_name": "D2_glide_50pct",
+      "glide_ratio": 0.5,
+      "n_pulse_frames": 5,
+      "n_glide_frames": 5,
+      "n_samples": 150,
+      "accuracy_as_drone": 0.8,
+      "class_distribution": {
+        "Enemy Drone": 120,
+        "Bird": 17,
+        "Friendly UAV": 11,
+        "Manned Aircraft": 2
+      }
+    },
+    {
+      "attack_name": "D2_glide_60pct",
+      "glide_ratio": 0.6,
+      "n_pulse_frames": 4,
+      "n_glide_frames": 6,
+      "n_samples": 150,
+      "accuracy_as_drone": 0.8933333333333333,
+      "class_distribution": {
+        "Enemy Drone": 134,
+        "Bird": 13,
+        "Friendly UAV": 2,
+        "Manned Aircraft": 1
+      }
+    },
+    {
+      "attack_name": "D2_glide_70pct",
+      "glide_ratio": 0.7,
+      "n_pulse_frames": 3,
+      "n_glide_frames": 7,
+      "n_samples": 150,
+      "accuracy_as_drone": 0.88,
+      "class_distribution": {
+        "Enemy Drone": 132,
+        "Bird": 14,
+        "Friendly UAV": 4,
+        "Manned Aircraft": 0
+      }
+    },
+    {
+      "attack_name": "D2_glide_80pct",
+      "glide_ratio": 0.8,
+      "n_pulse_frames": 2,
+      "n_glide_frames": 8,
+      "n_samples": 150,
+      "accuracy_as_drone": 0.8533333333333334,
+      "class_distribution": {
+        "Enemy Drone": 128,
+        "Bird": 13,
+        "Friendly UAV": 8,
+        "Manned Aircraft": 1
+      }
+    },
+    {
+      "attack_name": "D2_glide_90pct",
+      "glide_ratio": 0.9,
+      "n_pulse_frames": 1,
+      "n_glide_frames": 9,
+      "n_samples": 150,
+      "accuracy_as_drone": 0.86,
+      "class_distribution": {
+        "Enemy Drone": 129,
+        "Bird": 14,
+        "Friendly UAV": 6,
+        "Manned Aircraft": 1
+      }
+    },
+    {
+      "attack_name": "D2_glide_100pct",
+      "glide_ratio": 1.0,
+      "n_pulse_frames": 0,
+      "n_glide_frames": 10,
+      "n_samples": 150,
+      "accuracy_as_drone": 0.8133333333333334,
+      "class_distribution": {
+        "Enemy Drone": 122,
+        "Bird": 19,
+        "Friendly UAV": 8,
+        "Manned Aircraft": 1
+      }
+    }
+  ]
+}

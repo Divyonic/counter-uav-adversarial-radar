@@ -1,0 +1,70 @@
+(seed=42, n_attack_samples=150)
+======================================================================
+STEP 1: Generating clean 4-class dataset @ SNR=15dB
+======================================================================
+Generating dataset: 300 samples/class, SNR=15 dB
+  Generating Enemy Drone... done
+  Generating Bird... done
+  Generating Friendly UAV... done
+  Generating Manned Aircraft... done
+Training CNN+LSTM+BFP baseline...
+    Epoch 10: loss=0.1472, val_acc=1.0000
+    Early stopping at epoch 18
+Clean-test accuracy: 0.8889
+
+======================================================================
+STEP 2: Running D2 attack variants (pulse-and-glide)
+======================================================================
+
+  Running D2 glide_ratio=0.0 (0/10 frames glide)...
+    Accuracy (correct as drone): 0.833
+    Class distribution: {'Enemy Drone': 125, 'Bird': 17, 'Friendly UAV': 6, 'Manned Aircraft': 2}
+
+  Running D2 glide_ratio=0.2 (2/10 frames glide)...
+    Accuracy (correct as drone): 0.840
+    Class distribution: {'Enemy Drone': 126, 'Bird': 18, 'Friendly UAV': 4, 'Manned Aircraft': 2}
+
+  Running D2 glide_ratio=0.4 (4/10 frames glide)...
+    Accuracy (correct as drone): 0.847
+    Class distribution: {'Enemy Drone': 127, 'Bird': 14, 'Friendly UAV': 8, 'Manned Aircraft': 1}
+
+  Running D2 glide_ratio=0.5 (5/10 frames glide)...
+    Accuracy (correct as drone): 0.800
+    Class distribution: {'Enemy Drone': 120, 'Bird': 17, 'Friendly UAV': 11, 'Manned Aircraft': 2}
+
+  Running D2 glide_ratio=0.6 (6/10 frames glide)...
+    Accuracy (correct as drone): 0.893
+    Class distribution: {'Enemy Drone': 134, 'Bird': 13, 'Friendly UAV': 2, 'Manned Aircraft': 1}
+
+  Running D2 glide_ratio=0.7 (7/10 frames glide)...
+    Accuracy (correct as drone): 0.880
+    Class distribution: {'Enemy Drone': 132, 'Bird': 14, 'Friendly UAV': 4, 'Manned Aircraft': 0}
+
+  Running D2 glide_ratio=0.8 (8/10 frames glide)...
+    Accuracy (correct as drone): 0.853
+    Class distribution: {'Enemy Drone': 128, 'Bird': 13, 'Friendly UAV': 8, 'Manned Aircraft': 1}
+
+  Running D2 glide_ratio=0.9 (9/10 frames glide)...
+    Accuracy (correct as drone): 0.860
+    Class distribution: {'Enemy Drone': 129, 'Bird': 14, 'Friendly UAV': 6, 'Manned Aircraft': 1}
+
+  Running D2 glide_ratio=1.0 (10/10 frames glide)...
+    Accuracy (correct as drone): 0.813
+    Class distribution: {'Enemy Drone': 122, 'Bird': 19, 'Friendly UAV': 8, 'Manned Aircraft': 1}
+
+Results saved to /Users/drexonindustries/experiments/counter_uav/results/attack_d2_results.json
+
+======================================================================
+SUMMARY
+======================================================================
+Glide ratio     Pulse:Glide     Accuracy     Dominant class           
+-------------------------------------------------------------------
+0.00            10:0             0.833        Enemy Drone (125)
+0.20            8:2             0.840        Enemy Drone (126)
+0.40            6:4             0.847        Enemy Drone (127)
+0.50            5:5             0.800        Enemy Drone (120)
+0.60            4:6             0.893        Enemy Drone (134)
+0.70            3:7             0.880        Enemy Drone (132)
+0.80            2:8             0.853        Enemy Drone (128)
+0.90            1:9             0.860        Enemy Drone (129)
+1.00            0:10            0.813        Enemy Drone (122)
