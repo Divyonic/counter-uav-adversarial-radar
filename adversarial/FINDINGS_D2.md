@@ -1,13 +1,13 @@
-# Attack D2: Pulse-and-Glide — Findings
+# Attack D2: Pulse-and-Glide: Findings
 
 ## TL;DR
-**D2 does not defeat the baseline classifier.** Even when every frame in the 10-frame LSTM window has its propeller micro-Doppler completely removed (glide_ratio = 1.0 — just body echo at bulk Doppler velocity), the classifier still predicts "drone" 81.3% of the time — within the noise band of the unmasked baseline (83.3%).
+**D2 does not defeat the baseline classifier.** Even when every frame in the 10-frame LSTM window has its propeller micro-Doppler completely removed (glide_ratio = 1.0, just body echo at bulk Doppler velocity), the classifier still predicts "drone" 81.3% of the time, within the noise band of the unmasked baseline (83.3%).
 
 **Conclusion:** the classifier is not using micro-Doppler information. It is classifying on bulk velocity, body echo amplitude, spectrogram texture, or other non-micro-Doppler features.
 
 ## Setup
 - Baseline: CNN+LSTM+BFP trained on 4-class synthetic FMCW at SNR=15 dB (n=300/class)
-- Attack: within each 10-frame sequence, a fraction `glide_ratio` of frames are generated with `n_blades=0` (no propellers) — pure body echo at bulk Doppler
+- Attack: within each 10-frame sequence, a fraction `glide_ratio` of frames are generated with `n_blades=0` (no propellers), pure body echo at bulk Doppler
 - Frame order randomised within each sequence (realistic: drone alternating pulse/glide)
 - Seed 42, 150 sequences per variant
 
@@ -29,7 +29,7 @@ Variance range: 80.0 – 89.3%. No monotonic relationship with glide ratio. Spec
 
 ## Interpretation
 
-This result is substantially stronger than the A2 null finding. A2 showed BFP is inert. D2 shows **all micro-Doppler is inert** — or at least, this classifier isn't using any of it.
+This result is substantially stronger than the A2 null finding. A2 showed BFP is inert. D2 shows **all micro-Doppler is inert**, or at least, this classifier isn't using any of it.
 
 Candidate features the classifier *must* be using (since it reaches ~85% without micro-Doppler):
 
@@ -44,7 +44,7 @@ In other words, this synthetic dataset has class imbalance baked into the bulk-k
 Three concrete implications:
 
 ### 1. The "novel physics-informed BFP feature" contribution in the baseline paper is fictional
-Neither BFP nor HERM nor micro-Doppler structure overall is being used by the classifier. The paper's headline architectural claim (that BFP aids discrimination) is not supported by evidence — the classifier would reach the same accuracy without it.
+Neither BFP nor HERM nor micro-Doppler structure overall is being used by the classifier. The paper's headline architectural claim (that BFP aids discrimination) is not supported by evidence, the classifier would reach the same accuracy without it.
 
 ### 2. The published 95.8% / 48.9% / 96.7% / 47.8% numbers characterise a bulk-kinematic classifier, not a micro-Doppler classifier
 The multi-instance advantage the LSTM provides (per the leakage test) is likely aggregating bulk-velocity consistency across frames, not harmonic structure.
@@ -55,7 +55,7 @@ Attacks that will actually work on this classifier:
 - **D1 (fly at bird-like speeds):** violates the `v_bulk` distribution the classifier implicitly learned.
 - **B3 (corner-reflector decoy):** inflates echo amplitude to aircraft-class values, potentially triggering misclassification.
 
-The `feature_attribution.py` diagnostic (running next) will quantify how much each feature group contributes — converting this hypothesis into measured accuracy drops under controlled masking.
+The `feature_attribution.py` diagnostic (running next) will quantify how much each feature group contributes, converting this hypothesis into measured accuracy drops under controlled masking.
 
 ## Methodology contribution
 
@@ -63,10 +63,10 @@ D2 + A2 + HERM together form a coherent methodological argument:
 
 > *In evaluating adversarial robustness, an attack that targets an inert feature has no measurable effect and should not be interpreted as evidence of classifier robustness. Feature-attribution analysis must precede attack design: identify which inputs the classifier actually uses, then design attacks against those. For counter-UAV micro-Doppler classifiers in particular, we find that two of the three commonly claimed physics-informed features (BFP and micro-Doppler structure) are inert in a representative CNN+LSTM pipeline trained on balanced-class synthetic data. The classifier's accuracy derives from bulk-kinematic parameters baked into the training distribution, not from the micro-Doppler signatures the paper's narrative claims it learns.*
 
-That is a strong, publishable, genuinely useful contribution — not just to counter-UAV radar but to any domain where "physics-informed ML" papers make architectural claims without rigorous feature-attribution analysis.
+That is a strong, publishable, genuinely useful contribution, not just to counter-UAV radar but to any domain where "physics-informed ML" papers make architectural claims without rigorous feature-attribution analysis.
 
 ## Files
-- `attack_d2_pulse_glide.py` — implementation
-- `attack_d2_results.json` — all 9 variants, raw numbers
-- `run_log_d2.txt` — full stdout
-- `feature_attribution.py` — next diagnostic (running now)
+- `attack_d2_pulse_glide.py`, implementation
+- `attack_d2_results.json`, all 9 variants, raw numbers
+- `run_log_d2.txt`, full stdout
+- `feature_attribution.py`, next diagnostic (running now)

@@ -114,7 +114,7 @@ def generate_bird_signal(R0, v_bulk, snr_db, params=RadarParams,
     body_osc = 0.4 * np.sin(2 * np.pi * flap_freq * t_slow)
     beat_matrix = amplitude * (1 + body_osc[:, None]) * np.exp(1j * phase)
 
-    # Wing micro-Doppler — stronger and more asymmetric than drones
+    # Wing micro-Doppler, stronger and more asymmetric than drones
     wing_phase_val = 2 * np.pi * flap_freq * t_slow
     v_wing = wingspan * 2 * np.pi * flap_freq * np.cos(wing_phase_val)
     # Asymmetry: downstroke 2x stronger
@@ -136,7 +136,7 @@ def generate_bird_signal(R0, v_bulk, snr_db, params=RadarParams,
 
 def generate_friendly_uav_signal(R0, v_bulk, snr_db, params=RadarParams,
                                   n_blades=2, rpm=3500, blade_len=0.20):
-    """Fixed-wing UAV with single pusher propeller — distinct from multi-rotor."""
+    """Fixed-wing UAV with single pusher propeller, distinct from multi-rotor."""
     Nc, Ns = params.Nc, params.Ns
     rcs_body = 0.05 + np.random.uniform(-0.01, 0.02)  # Larger than multi-rotor
 
@@ -187,7 +187,7 @@ def generate_aircraft_signal(R0, v_bulk, snr_db, params=RadarParams):
     phase = np.outer(f_beat, t_fast) * 2 * np.pi + phase_base[:, None]
     amplitude = np.sqrt(rcs_body) * 1e3
 
-    # Jet engine modulation — high frequency, small amplitude
+    # Jet engine modulation, high frequency, small amplitude
     engine_mod_freq = 800 + np.random.uniform(-100, 100)
     engine_mod = 1.0 + 0.08 * np.sin(2 * np.pi * engine_mod_freq * t_slow)
     # Also add compressor blade vibration harmonics
@@ -236,7 +236,7 @@ def compute_spectrogram(beat_matrix, params=RadarParams, nperseg=64, noverlap=56
 
 def resize_spectrogram(spectrogram, target_size=(128, 128)):
     from scipy.ndimage import zoom
-    # Convert to dB scale first — this is critical for CNN features
+    # Convert to dB scale first, this is critical for CNN features
     spec_db = 10 * np.log10(spectrogram + 1e-12)
     # Clip to dynamic range of 40 dB
     max_val = spec_db.max()

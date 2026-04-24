@@ -1,4 +1,4 @@
-# Attack A2: Fewer-Blade Drones — Findings
+# Attack A2: Fewer-Blade Drones: Findings
 
 ## TL;DR
 **A2 does not defeat the baseline classifier.** Across two independent runs (seed=42, n=100 and seed=123, n=200), the classifier achieves 78–91% accuracy against adversarial 1-blade drones at RPMs from 800 to 5000, with no systematic degradation compared to the clean 2-blade baseline. The attack fails.
@@ -61,10 +61,10 @@ Attacking a feature the classifier does not use is methodologically pointless. B
 - **Multi-instance aggregation by the LSTM** over parameter-diverse frames (per the leakage test in the baseline paper)
 
 Next attacks should target these. Candidates:
-- **B1 (RAM wrap)** — reduces bulk RCS, affecting amplitude and possibly bulk Doppler detection
-- **D1 (bird-mimicking flight)** — modifies bulk Doppler profile and between-frame parameter statistics
-- **D2 (pulse-and-glide)** — floods the 10-frame LSTM window with zero-signal frames, disrupting multi-instance aggregation
-- **E1 (ornithopter)** — rewrites the entire micro-Doppler signature, not just BFP
+- **B1 (RAM wrap)**, reduces bulk RCS, affecting amplitude and possibly bulk Doppler detection
+- **D1 (bird-mimicking flight)**, modifies bulk Doppler profile and between-frame parameter statistics
+- **D2 (pulse-and-glide)**, floods the 10-frame LSTM window with zero-signal frames, disrupting multi-instance aggregation
+- **E1 (ornithopter)**, rewrites the entire micro-Doppler signature, not just BFP
 
 ## Methodology contribution
 
@@ -72,7 +72,7 @@ The broader takeaway: adversarial evaluation of ML systems needs a feature-attri
 
 ## Files
 
-- `attack_a2_fewer_blades.py` — attack implementation (accepts `ATTACK_SEED` and `ATTACK_N_SAMPLES` env vars)
-- `attack_a2_results_seed42.json` — run 1 (n=100)
-- `attack_a2_results_seed123.json` — run 2 (n=200)
-- `run_log_seed42.txt`, `run_log_seed123.txt` — full stdout from each run
+- `attack_a2_fewer_blades.py`, attack implementation (accepts `ATTACK_SEED` and `ATTACK_N_SAMPLES` env vars)
+- `attack_a2_results_seed42.json`, run 1 (n=100)
+- `attack_a2_results_seed123.json`, run 2 (n=200)
+- `run_log_seed42.txt`, `run_log_seed123.txt`, full stdout from each run

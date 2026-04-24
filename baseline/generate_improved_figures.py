@@ -188,7 +188,7 @@ def fig4_cfar_improved():
     axes[2].set_ylabel('Velocity (m/s)')
     axes[2].legend(loc='upper right', fontsize=9)
 
-    plt.suptitle('CFAR vs Fixed Threshold Detection — Drone Target at SNR = 25 dB',
+    plt.suptitle('CFAR vs Fixed Threshold Detection, Drone Target at SNR = 25 dB',
                  fontweight='bold', fontsize=14, y=1.02)
     plt.tight_layout()
     plt.savefig(os.path.join(FIGURES_DIR, 'cfar_detection.png'), dpi=150, bbox_inches='tight')
@@ -226,7 +226,7 @@ def fig5_model_architecture():
 
     # Input
     draw_box(2, 8.7, 5, 0.7, '#95a5a6', 'Input: Spectrogram Sequence',
-             '{S₁, S₂, ..., S₁₀}  —  T=10 frames × 128×128', fontsize=11)
+             '{S₁, S₂, ..., S₁₀} ,  T=10 frames × 128×128', fontsize=11)
 
     # Dashed box around CNN (shared weights)
     shared_box = FancyBboxPatch((1.5, 5.0), 6, 3.3, boxstyle="round,pad=0.15",
@@ -281,7 +281,7 @@ def fig5_model_architecture():
 
     # LSTM
     draw_box(2.5, 2.2, 5.5, 1.0, '#8e44ad', 'LSTM Temporal Tracker',
-             'LSTM₁(64) → LSTM₂(32) — ~63K params', fontsize=11)
+             'LSTM₁(64) → LSTM₂(32), ~63K params', fontsize=11)
 
     arrow_down(5.25, 2.2, 1.5, '32-dim')
 

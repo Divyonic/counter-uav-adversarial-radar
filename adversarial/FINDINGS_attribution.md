@@ -1,4 +1,4 @@
-# Feature Attribution — Findings
+# Feature Attribution: Findings
 
 ## TL;DR
 
@@ -7,7 +7,7 @@ Formal permutation-importance tests partially **confirm** and partially **refine
 **Confirmed:**
 - The LSTM is **multi-instance**, not temporal. Shuffling frame order within each 10-frame sequence changes accuracy by −1.6 pp (within noise).
 - The spectrogram time axis is **largely redundant**. Zeroing out the central 50% of time bins causes 0.0 pp drop in accuracy.
-- **BFP is being used by the classifier**, but not as a physics measurement — A2 established that the measured BFP is noise (45 ± 59 Hz regardless of ground truth). So what attribution shows is that the *distribution* of that noise is class-correlated enough for the classifier to exploit it.
+- **BFP is being used by the classifier**, but not as a physics measurement, A2 established that the measured BFP is noise (45 ± 59 Hz regardless of ground truth). So what attribution shows is that the *distribution* of that noise is class-correlated enough for the classifier to exploit it.
 
 **Refined (important correction to D2's framing):**
 - Spectrogram permutation causes a 41 pp drop, BFP permutation 38 pp. Both are load-bearing.
@@ -47,7 +47,7 @@ This means the two mask tests are **confounded** with respect to bulk-vs-micro-D
 - The "bulk-Doppler mask" (central 25%) zeros the region where drones and birds sit → hurts drone-vs-bird discrimination (−16 pp).
 - The "micro-Doppler mask" (outer 50%) zeros the region where aircraft and fast UAVs sit → hurts aircraft identification most (−33 pp).
 
-Neither mask cleanly isolates "bulk Doppler" from "micro-Doppler sidebands" because for each class the *bulk* energy lives in a different Doppler band. A cleaner test would be a class-conditional mask placed relative to each sample's bulk Doppler peak — that is a follow-up experiment.
+Neither mask cleanly isolates "bulk Doppler" from "micro-Doppler sidebands" because for each class the *bulk* energy lives in a different Doppler band. A cleaner test would be a class-conditional mask placed relative to each sample's bulk Doppler peak, that is a follow-up experiment.
 
 ## Reconciling with D2
 
@@ -63,11 +63,11 @@ D2 did not disturb that. Permutation and masking do.
 
 The critique survives but becomes sharper:
 
-1. **BFP, as implemented in the baseline paper, is a class-correlated noise distribution, not a physics measurement.** The classifier uses its values, but those values do not measure blade flash periodicity — A2 demonstrated that measured BFP is independent of ground-truth physics.
+1. **BFP, as implemented in the baseline paper, is a class-correlated noise distribution, not a physics measurement.** The classifier uses its values, but those values do not measure blade flash periodicity, A2 demonstrated that measured BFP is independent of ground-truth physics.
 2. **The LSTM is not a temporal tracker.** Frame-order permutation has no effect. It is a multi-instance aggregator, consistent with the leakage test finding.
 3. **The spectrogram is being used, but to localize bulk Doppler peaks, not to analyze harmonic structure.** Time-axis information is entirely redundant; frequency-band masking in the region where bulk Doppler energy sits causes the largest accuracy drop.
 
-The "physics-informed CNN+LSTM+BFP" architecture, when trained on this synthetic dataset, has the same functional behavior as a much simpler "bulk-Doppler peak detector + class-prior classifier" — minus the interpretability that a simpler model would provide.
+The "physics-informed CNN+LSTM+BFP" architecture, when trained on this synthetic dataset, has the same functional behavior as a much simpler "bulk-Doppler peak detector + class-prior classifier", minus the interpretability that a simpler model would provide.
 
 ## Next experiments
 
@@ -77,6 +77,6 @@ The "physics-informed CNN+LSTM+BFP" architecture, when trained on this synthetic
 
 ## Files
 
-- `feature_attribution.py` — implementation
-- `results/feature_attribution_results.json` — raw numbers
-- `run_log_feat_attr.txt` — full stdout (copy of `/tmp/feat_attr.log`)
+- `feature_attribution.py`, implementation
+- `results/feature_attribution_results.json`, raw numbers
+- `run_log_feat_attr.txt`, full stdout (copy of `/tmp/feat_attr.log`)

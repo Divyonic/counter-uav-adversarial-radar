@@ -8,16 +8,16 @@ test set and measure how much accuracy drops. Large drop = important
 feature. Small drop = feature is not doing discriminative work.
 
 Tests:
-  1. BFP permutation — shuffle BFP vectors across samples. If accuracy
+  1. BFP permutation, shuffle BFP vectors across samples. If accuracy
      stays high, BFP is inert (confirms our A2 and HERM findings).
-  2. Spectrogram permutation — shuffle spectrograms across samples
+  2. Spectrogram permutation, shuffle spectrograms across samples
      (sanity check: main input should be important).
-  3. Frame-order permutation within sequence — shuffle the 10 frames
+  3. Frame-order permutation within sequence, shuffle the 10 frames
      inside each sequence. If accuracy stays high, the LSTM does not
-     depend on temporal order — confirming multi-instance aggregation.
-  4. Bulk-Doppler masking — zero out the central (low-Doppler) band of
+     depend on temporal order, confirming multi-instance aggregation.
+  4. Bulk-Doppler masking, zero out the central (low-Doppler) band of
      each spectrogram. Measures dependence on bulk target velocity.
-  5. Micro-Doppler masking — zero out the outer (high-Doppler) bands.
+  5. Micro-Doppler masking, zero out the outer (high-Doppler) bands.
      Measures dependence on micro-Doppler sidebands.
 
 Output: results/feature_attribution_results.json with accuracy per test.
@@ -145,7 +145,7 @@ def test_frame_order_shuffle(model, Xs_te, bfps_te, ys_te, n_trials=3):
 
 
 def test_bulk_doppler_mask(model, Xs_te, bfps_te, ys_te, mask_frac=0.25):
-    """Mask (zero out) the central band of each spectrogram — bulk Doppler."""
+    """Mask (zero out) the central band of each spectrogram, bulk Doppler."""
     H = Xs_te.shape[-1]  # 128
     mid = H // 2
     half_w = int(H * mask_frac / 2)
@@ -161,7 +161,7 @@ def test_bulk_doppler_mask(model, Xs_te, bfps_te, ys_te, mask_frac=0.25):
 
 
 def test_micro_doppler_mask(model, Xs_te, bfps_te, ys_te, mask_frac=0.50):
-    """Mask (zero out) the outer bands — micro-Doppler sidebands."""
+    """Mask (zero out) the outer bands, micro-Doppler sidebands."""
     H = Xs_te.shape[-1]  # 128
     mid = H // 2
     half_w = int(H * (1 - mask_frac) / 2)
@@ -234,7 +234,7 @@ def main():
     print(f"\nResults saved to {out_path}")
 
     print("\n" + "=" * 70)
-    print("SUMMARY — feature importance (larger drop = more important)")
+    print("SUMMARY, feature importance (larger drop = more important)")
     print("=" * 70)
     print(f"Baseline clean accuracy: {baseline_acc:.4f}")
     print()

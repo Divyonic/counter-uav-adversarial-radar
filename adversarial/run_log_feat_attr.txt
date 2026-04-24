@@ -42,7 +42,7 @@ Running feature attribution tests...
 Results saved to /Users/drexonindustries/experiments/counter_uav/results/feature_attribution_results.json
 
 ======================================================================
-SUMMARY — feature importance (larger drop = more important)
+SUMMARY, feature importance (larger drop = more important)
 ======================================================================
 Baseline clean accuracy: 0.8889
 

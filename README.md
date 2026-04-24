@@ -1,11 +1,11 @@
 # Counter-UAV Radar: Attribution-First Adversarial Evaluation
 
-**Author:** Divya Kumar Jitendra Patel — Indian Institute of Technology, Madras
+**Author:** Divya Kumar Jitendra Patel, Indian Institute of Technology, Madras
 **Contact:** `divyakumarpatel202@gmail.com`
 
 This repository documents a single case study on how counter-UAV radar ML classifiers should be evaluated for adversarial robustness. We start from a representative CNN + LSTM + physics-informed classifier, run two physically motivated attacks, find null results, and then show through feature attribution that the attacks were targeting features the classifier never used.
 
-The central finding is a methodological one: *adversarial evaluation without feature attribution is unreliable.* Null results are uninterpretable in isolation — they can mean the classifier is robust, or they can mean the attack disturbs features the classifier ignores. The two are indistinguishable without attribution, and this repository shows why.
+The central finding is a methodological one: *adversarial evaluation without feature attribution is unreliable.* Null results are uninterpretable in isolation, they can mean the classifier is robust, or they can mean the attack disturbs features the classifier ignores. The two are indistinguishable without attribution, and this repository shows why.
 
 ---
 
@@ -79,13 +79,13 @@ Each run re-trains the baseline model from scratch; there is no pre-trained chec
 |:---------------------------------------|:-----------------------------------------------------------|
 | Baseline classifier                    | Implemented, trained, results in `baseline/results/`       |
 | Data-leakage diagnostic                | Run, shows LSTM gain is multi-instance not temporal        |
-| HERM-line alternative feature          | Implemented, underperforms BFP — negative result           |
+| HERM-line alternative feature          | Implemented, underperforms BFP, negative result           |
 | Attack A2 (fewer blades)               | Run across 2 seeds, null result documented                 |
 | Attack D2 (pulse-and-glide)            | Run across 9 glide ratios, null result documented          |
 | Feature attribution                    | Run, 6 tests, results reconcile A2 and D2                  |
-| Preprint                               | Written — `paper/preprint.md`                              |
-| Real-data validation (Karlsson 77 GHz) | Not attempted — flagged as next step                       |
-| Successful attack (B1 amplitude / D1 bird-speed) | Not attempted — predicted by attribution           |
+| Preprint                               | Written, `paper/preprint.md`                              |
+| Real-data validation (Karlsson 77 GHz) | Not attempted, flagged as next step                       |
+| Successful attack (B1 amplitude / D1 bird-speed) | Not attempted, predicted by attribution           |
 
 The repository is archived in its current state. The preprint is a short working paper, not a peer-reviewed publication. Readers interested in real-data validation or a constructive adversarial attack should consider those open directions.
 
@@ -115,7 +115,7 @@ https://github.com/Divyonic/counter-uav-adversarial-radar
 
 ## License
 
-MIT — see [`LICENSE`](LICENSE).
+MIT, see [`LICENSE`](LICENSE).
 
 ## Contact
 

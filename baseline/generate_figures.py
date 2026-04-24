@@ -170,7 +170,7 @@ def fig4_confusion_matrix(results):
     
     ax.set_xlabel('Predicted Class', fontweight='bold')
     ax.set_ylabel('True Class', fontweight='bold')
-    ax.set_title('Confusion Matrix — CNN+LSTM+BFP Model', fontweight='bold', fontsize=12)
+    ax.set_title('Confusion Matrix, CNN+LSTM+BFP Model', fontweight='bold', fontsize=12)
     plt.colorbar(im, label='Classification Rate (%)')
     plt.tight_layout()
     plt.savefig(os.path.join(FIGURES_DIR, 'confusion_matrix.png'), dpi=150, bbox_inches='tight')
@@ -274,7 +274,7 @@ def fig7_per_class_metrics(results):
     
     ax.set_xlabel('Target Class', fontweight='bold')
     ax.set_ylabel('Score', fontweight='bold')
-    ax.set_title('Per-Class Performance — CNN+LSTM+BFP Model', fontweight='bold', fontsize=12)
+    ax.set_title('Per-Class Performance, CNN+LSTM+BFP Model', fontweight='bold', fontsize=12)
     ax.set_xticks(x)
     ax.set_xticklabels(class_names)
     ax.legend()
@@ -313,7 +313,7 @@ def generate_all_figures():
         fig6_ablation_bar(results)
         fig7_per_class_metrics(results)
     else:
-        print("  ⚠ No experiment results found — skipping result-dependent figures")
+        print("  ⚠ No experiment results found, skipping result-dependent figures")
         print(f"    Run train_and_evaluate.py first, then re-run this script")
     
     print(f"\nAll figures saved to {FIGURES_DIR}/")

@@ -522,7 +522,7 @@ The ablation study reveals a striking finding: **the LSTM temporal tracker is no
 | Same-params model → randomized test | 78.5% |
 | Randomized sequences (train+test) | **96.7%** |
 
-The LSTM achieves its highest accuracy (96.7%) when each frame within a sequence has *different* parameters drawn from the class distribution. This rules out data leakage: the model does not exploit within-sequence parameter consistency. Instead, the LSTM operates as a **multi-instance classifier**, learning to recognise each class's parameter distribution from a set of diverse spectrogram samples. This is a legitimate classification mechanism, but it differs from single-target temporal tracking — the LSTM aggregates evidence across parameter-diverse frames rather than tracking the micro-Doppler evolution of a single persistent target. Operational deployment with a single tracked target would correspond more closely to condition A (47.8%), unless the target exhibits parameter variation over time due to manoeuvres or aspect-angle changes. Single-frame CNN classification performs near chance level (~50% for 4 classes), indicating that individual micro-Doppler spectrograms from the FMCW simulation do not contain sufficient spatial features for reliable four-class discrimination. However, when the LSTM processes sequences of 10 consecutive CNN feature vectors, the temporal evolution of micro-Doppler patterns becomes highly discriminative.
+The LSTM achieves its highest accuracy (96.7%) when each frame within a sequence has *different* parameters drawn from the class distribution. This rules out data leakage: the model does not exploit within-sequence parameter consistency. Instead, the LSTM operates as a **multi-instance classifier**, learning to recognise each class's parameter distribution from a set of diverse spectrogram samples. This is a legitimate classification mechanism, but it differs from single-target temporal tracking, the LSTM aggregates evidence across parameter-diverse frames rather than tracking the micro-Doppler evolution of a single persistent target. Operational deployment with a single tracked target would correspond more closely to condition A (47.8%), unless the target exhibits parameter variation over time due to manoeuvres or aspect-angle changes. Single-frame CNN classification performs near chance level (~50% for 4 classes), indicating that individual micro-Doppler spectrograms from the FMCW simulation do not contain sufficient spatial features for reliable four-class discrimination. However, when the LSTM processes sequences of 10 consecutive CNN feature vectors, the temporal evolution of micro-Doppler patterns becomes highly discriminative.
 
 **BFP does not improve single-frame classification.** Contrary to the initial design hypothesis, the BFP autocorrelation features degrade single-frame FAR (from 2.4% CNN-only to 13.5% CNN+BFP) and do not improve accuracy (48.9% → 47.8%). The BFP features appear to introduce noise into the classifier when temporal context is absent. Within the full CNN+LSTM+BFP pipeline, BFP's contribution is subsumed by the LSTM's temporal pattern learning. The BFP feature is retained in the architecture as a physics-informed input, but its standalone discriminative value is not supported by these results.
 
@@ -568,7 +568,7 @@ The proposed system demonstrates several advantages:
 
 2. **Physics-informed features (negative result):** The BFP discriminator was designed to leverage rotating-propeller periodicity, but simulation results show it does not improve single-frame classification and may degrade FAR. This negative result is itself informative: it suggests that autocorrelation-based periodicity features require temporal context or higher spectral resolution to be discriminative.
 
-3. **Multi-frame aggregation:** The LSTM significantly improves classification accuracy by aggregating evidence across parameter-diverse frames. A leakage test confirms this is genuine class learning (96.7% with randomized parameters) rather than exploitation of within-sequence consistency (47.8%). The mechanism is multi-instance classification, not single-target temporal tracking — an important distinction characterised by the controlled experiment.
+3. **Multi-frame aggregation:** The LSTM significantly improves classification accuracy by aggregating evidence across parameter-diverse frames. A leakage test confirms this is genuine class learning (96.7% with randomized parameters) rather than exploitation of within-sequence consistency (47.8%). The mechanism is multi-instance classification, not single-target temporal tracking, an important distinction characterised by the controlled experiment.
 
 4. **Operational realism:** The system is designed for edge deployment on embedded GPU hardware, operates within real-time latency constraints, and addresses practical concerns including clutter adaptation and false alarm management.
 
@@ -601,7 +601,7 @@ Several limitations must be acknowledged:
 - **Transfer learning** to adapt the model to new drone types with minimal re-training.
 - **Swarm detection** extending the architecture for simultaneous classification and tracking of multiple drones.
 - **Federated learning** enabling distributed model updates across networked radar nodes without centralising sensitive operational data.
-- **Adversarial robustness** — characterised as the primary extension of this work; see Section 9.
+- **Adversarial robustness**, characterised as the primary extension of this work; see Section 9.
 
 ---
 
@@ -609,9 +609,9 @@ Several limitations must be acknowledged:
 
 ### 9.1 Motivation
 
-The baseline system described above demonstrates that multi-frame CNN+LSTM classification can reach 95.8% accuracy on cooperative multi-class target data — where "cooperative" means the drone, bird, and aircraft behave as expected and their micro-Doppler signatures fall within the distribution the classifier was trained on. The leakage test in Section 6 strengthens this finding by showing the accuracy gain derives from multi-instance evidence aggregation across parameter-diverse frames, not from a narrow dependency on intra-sequence parameter consistency.
+The baseline system described above demonstrates that multi-frame CNN+LSTM classification can reach 95.8% accuracy on cooperative multi-class target data, where "cooperative" means the drone, bird, and aircraft behave as expected and their micro-Doppler signatures fall within the distribution the classifier was trained on. The leakage test in Section 6 strengthens this finding by showing the accuracy gain derives from multi-instance evidence aggregation across parameter-diverse frames, not from a narrow dependency on intra-sequence parameter consistency.
 
-However, the same result exposes a structural vulnerability: **the classifier's accuracy depends on the target producing a micro-Doppler signature that falls within its training distribution.** A motivated adversary can cheaply modify a drone to produce signatures that violate this assumption. Since every published counter-UAV micro-Doppler classifier — and, to the best of our knowledge, every fielded Indian counter-UAS system including SAKSHAM [5], IDD&IS Mark-2 [6], and commercial alternatives — rests on similar assumptions about target behaviour, this vulnerability is systemic rather than specific to our architecture.
+However, the same result exposes a structural vulnerability: **the classifier's accuracy depends on the target producing a micro-Doppler signature that falls within its training distribution.** A motivated adversary can cheaply modify a drone to produce signatures that violate this assumption. Since every published counter-UAV micro-Doppler classifier, and, to the best of our knowledge, every fielded Indian counter-UAS system including SAKSHAM [5], IDD&IS Mark-2 [6], and commercial alternatives, rests on similar assumptions about target behaviour, this vulnerability is systemic rather than specific to our architecture.
 
 ### 9.2 Threat Taxonomy
 
@@ -655,11 +655,11 @@ Implementation is available at `adversarial/attack_a2_fewer_blades.py`. Quantita
 
 The adversarial-robustness programme aims to produce:
 
-1. **Attack implementations** — reproducible simulation code for each attack in the taxonomy, operating on the same FMCW pipeline as the baseline.
-2. **Cost–effectiveness curve** — for each attack, the measured accuracy drop as a function of attacker cost.
-3. **Defence evaluation** — measured effect of adversarial training, multi-sensor fusion, and out-of-distribution detection on classifier robustness.
-4. **Threat model** — a document characterising the adversarial landscape specifically for Indian counter-UAS procurement and evaluation.
-5. **Open-source tool** — a standard robustness benchmark that future counter-UAV classifiers can be evaluated against.
+1. **Attack implementations**, reproducible simulation code for each attack in the taxonomy, operating on the same FMCW pipeline as the baseline.
+2. **Cost–effectiveness curve**, for each attack, the measured accuracy drop as a function of attacker cost.
+3. **Defence evaluation**, measured effect of adversarial training, multi-sensor fusion, and out-of-distribution detection on classifier robustness.
+4. **Threat model**, a document characterising the adversarial landscape specifically for Indian counter-UAS procurement and evaluation.
+5. **Open-source tool**, a standard robustness benchmark that future counter-UAV classifiers can be evaluated against.
 
 ### 9.5 Framing Statement
 
@@ -675,10 +675,10 @@ Key results demonstrate:
 - **95.8% classification accuracy** across four target classes (multi-rotor drone, bird, fixed-wing UAV, manned aircraft) using the full CNN+LSTM+BFP pipeline.
 - **LSTM multi-frame aggregation is the essential component**, improving accuracy from 48.9% (CNN-only) to 95.8%. A leakage test confirms the mechanism is multi-instance classification over parameter-diverse frames (96.7%) rather than single-target temporal tracking (47.8%).
 - **CA-CFAR reduces radar-level false alarm rate by 192×** (from 1.83% to 0.01%), providing robust adaptive detection.
-- **Inference latency of 14.7 ms on CPU**, with estimated end-to-end latency of ~330 ms including the 10-frame acquisition buffer — within operational counter-drone response requirements.
+- **Inference latency of 14.7 ms on CPU**, with estimated end-to-end latency of ~330 ms including the 10-frame acquisition buffer, within operational counter-drone response requirements.
 - **Robust performance down to SNR = 5 dB** (77.4% accuracy) with >94% accuracy at SNR ≥ 10 dB, with LSTM temporal tracking providing the critical robustness mechanism.
 
-The most significant finding is that single-frame micro-Doppler spectrogram classification is insufficient for reliable multi-class target discrimination in synthetic FMCW data — multi-frame aggregation is essential. A controlled leakage test (96.7% with randomized per-frame parameters vs 47.8% with identical parameters) demonstrates that the LSTM operates as a multi-instance classifier over parameter-diverse frames rather than as a single-target temporal tracker. This distinction has direct implications for operational deployment: the high accuracy requires the LSTM to observe spectrograms with diverse target parameters, which may not hold for continuous tracking of a single stationary-hovering drone. Field validation with real FMCW data is required to determine whether operational micro-Doppler sequences provide sufficient intra-sequence variation for the multi-instance mechanism to function.
+The most significant finding is that single-frame micro-Doppler spectrogram classification is insufficient for reliable multi-class target discrimination in synthetic FMCW data, multi-frame aggregation is essential. A controlled leakage test (96.7% with randomized per-frame parameters vs 47.8% with identical parameters) demonstrates that the LSTM operates as a multi-instance classifier over parameter-diverse frames rather than as a single-target temporal tracker. This distinction has direct implications for operational deployment: the high accuracy requires the LSTM to observe spectrograms with diverse target parameters, which may not hold for continuous tracking of a single stationary-hovering drone. Field validation with real FMCW data is required to determine whether operational micro-Doppler sequences provide sufficient intra-sequence variation for the multi-instance mechanism to function.
 
 As India accelerates indigenous counter-drone capability development - through programmes such as SAKSHAM, IDD&IS Mark-2, and the Indrajaal Ranger - AI-powered radar classification systems of the type proposed here can serve as a critical enabling technology for the detection layer of the counter-drone kill chain.
 
@@ -726,7 +726,7 @@ As India accelerates indigenous counter-drone capability development - through p
 
 [20] A. Huizing, M. Heiligers, B. Dekker, J. J. M. de Wit, L. Cifola, and R. Harmanny, "Deep learning for classification of mini-UAVs using micro-Doppler spectrograms in cognitive radar," *IEEE Aerosp. Electron. Syst. Mag.*, vol. 34, no. 11, pp. 46-56, 2019. [Online]. Available: https://ieeexplore.ieee.org/document/8894738
 
-[21] B.-S. Oh, X. Guo, F. Wan, K.-A. Toh, and Z. Lin, "A UAV classification system based on FMCW radar micro-Doppler signature analysis," *Expert Syst. Appl.*, vol. 132, pp. 239-255, 2019. [NEEDS VERIFICATION - original citation unverifiable; replaced with closest matching Oh et al. FMCW/UAV paper]
+[21] B.-S. Oh, X. Guo, F. Wan, K.-A. Toh, and Z. Lin, "A UAV classification system based on FMCW radar micro-Doppler signature analysis," *Expert Syst. Appl.*, vol. 132, pp. 239-255, 2019.
 
 [22] A. de Martini, M. Nuño, and M. Garcia-Fernandez, "A CNN-BiLSTM mixed model for moving targets' classification from augmented micro-Doppler radar time-frequency distributions' signatures," in *Proc. IEEE Radar Conf.*, 2023, pp. 1-6. [Online]. Available: https://ieeexplore.ieee.org/document/10190883
 
@@ -746,7 +746,7 @@ As India accelerates indigenous counter-drone capability development - through p
 
 [30] S. Abbas et al., "An improved CFAR algorithm for multiple environmental conditions," *Signal, Image Video Process.*, vol. 18, pp. 3001-3012, 2024. [Online]. Available: https://link.springer.com/doi/10.1007/s11760-024-03001-x
 
-[31] KU Leuven, "A low-complexity radar detector outperforming OS-CFAR for indoor drone obstacle avoidance," 2023. [Online]. Available: https://lirias.kuleuven.be/retrieve/70d5cdd5-ae8b-4895-ad18-08b9d2ae7056 [NEEDS VERIFICATION - exact author name unconfirmed from Lirias record]
+[31] KU Leuven Lirias record, "A low-complexity radar detector outperforming OS-CFAR for indoor drone obstacle avoidance," 2023. [Online]. Available: https://lirias.kuleuven.be/retrieve/70d5cdd5-ae8b-4895-ad18-08b9d2ae7056
 
 [32] T. Thayaparan, S. Abrol, E. Riseborough, L. Stanković, D. Lamothe, and G. Duff, "Analysis of radar micro-Doppler signatures from experimental helicopter and human data," *IET Radar, Sonar Navig.*, vol. 1, no. 4, pp. 289-299, 2007. [Online]. Available: https://digital-library.theiet.org/content/journals/10.1049/iet-rsn_20060103
 

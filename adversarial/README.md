@@ -10,7 +10,7 @@ See the top-level preprint in `../paper/preprint.md` for the full methodology ar
 
 ## Experiments in this directory
 
-### A2 — blade-count reduction
+### A2: blade-count reduction
 
 **Script:** `attack_a2_fewer_blades.py`
 **Write-up:** `FINDINGS_A2.md`
@@ -19,18 +19,18 @@ See the top-level preprint in `../paper/preprint.md` for the full methodology ar
 
 Six variants spanning the gradient from "clean 2-blade control" to "1-blade, 800 RPM, BFP at typical bird-flap frequency." Hypothesis: pushing the blade-flash fundamental into the bird band should destroy BFP as a discriminator and force bird misclassification.
 
-**Outcome — null.** Drone-class accuracy stays within 83.3%–89.3% across all six variants, indistinguishable from the unmasked baseline. Separate diagnostic shows the BFP extractor returns 45 ± 59 Hz on clean drone data regardless of ground-truth physics (13–167 Hz) — the BFP feature is numerically noise, so an attack that modifies the physics underneath it has no measurable effect.
+**Outcome, null.** Drone-class accuracy stays within 83.3%–89.3% across all six variants, indistinguishable from the unmasked baseline. Separate diagnostic shows the BFP extractor returns 45 ± 59 Hz on clean drone data regardless of ground-truth physics (13–167 Hz), the BFP feature is numerically noise, so an attack that modifies the physics underneath it has no measurable effect.
 
-### D2 — pulse-and-glide flight
+### D2: pulse-and-glide flight
 
 **Script:** `attack_d2_pulse_glide.py`
 **Write-up:** `FINDINGS_D2.md`
 **Raw results:** `attack_d2_results.json`
 **Run log:** `run_log_d2.txt`
 
-Nine variants, glide ratio from 0 (every frame has propeller content) to 1.0 (every frame in every 10-frame LSTM window is glide-only — body echo only, no propeller content anywhere in the sequence). Frame order randomised within each sequence to model realistic pulse/glide alternation.
+Nine variants, glide ratio from 0 (every frame has propeller content) to 1.0 (every frame in every 10-frame LSTM window is glide-only, body echo only, no propeller content anywhere in the sequence). Frame order randomised within each sequence to model realistic pulse/glide alternation.
 
-**Outcome — null.** Drone-class accuracy stays within 80.0%–89.3% across all glide ratios. Most striking: at glide ratio 1.0 (no propeller content in any frame), the classifier still returns drone 81.3% of the time.
+**Outcome, null.** Drone-class accuracy stays within 80.0%–89.3% across all glide ratios. Most striking: at glide ratio 1.0 (no propeller content in any frame), the classifier still returns drone 81.3% of the time.
 
 This is a stronger null than A2 because it removes propeller content from the *signal*, not just from the extracted feature. It cannot be explained away as a noisy extractor. The classifier's drone decision does not depend on propeller content.
 
@@ -54,7 +54,7 @@ Six perturbation tests on the trained classifier: spectrogram permutation across
 | BFP permutation across samples        | +37.9     | BFP used as class-correlated noise distribution         |
 | Spectrogram permutation across samples| +41.2     | Spectrogram content is important overall                |
 
-The attribution resolves A2 and D2. The classifier identifies drones by the position and amplitude of the bulk-Doppler peak — which both A2 and D2 leave intact. BFP is used, but as a class-correlated distributional fingerprint rather than as a physics measurement. Blade-flash harmonic structure and propeller micro-Doppler are not read by the classifier at any stage.
+The attribution resolves A2 and D2. The classifier identifies drones by the position and amplitude of the bulk-Doppler peak, which both A2 and D2 leave intact. BFP is used, but as a class-correlated distributional fingerprint rather than as a physics measurement. Blade-flash harmonic structure and propeller micro-Doppler are not read by the classifier at any stage.
 
 ---
 
@@ -62,8 +62,8 @@ The attribution resolves A2 and D2. The classifier identifies drones by the posi
 
 Attribution predicts that attacks targeting what the classifier actually *does* use should succeed.
 
-- **B1 — radar-absorbent material (RAM) wrap.** Reduces `rcs_body` by ~10 dB; predicted to push drone classification toward bird or below detection threshold.
-- **D1 — bird-speed flight.** Flies the drone at 5–10 m/s instead of 10–20 m/s; predicted to push drone bulk-Doppler into the bird class distribution.
+- **B1, radar-absorbent material (RAM) wrap.** Reduces `rcs_body` by ~10 dB; predicted to push drone classification toward bird or below detection threshold.
+- **D1, bird-speed flight.** Flies the drone at 5–10 m/s instead of 10–20 m/s; predicted to push drone bulk-Doppler into the bird class distribution.
 - **Class-conditional mask.** Zeroes out ±N bins around each sample's own bulk-Doppler peak; a cleaner version of the frequency-band masks in the attribution study.
 
 These are straightforward to implement using the same simulator and would close the "demonstrate one successful attack" gap in the preprint. They are not implemented in this repository.

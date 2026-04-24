@@ -22,19 +22,19 @@ pdf_options:
 Indian Institute of Technology, Madras
 `divyakumarpatel202@gmail.com`
 
-*April 2026 — working preprint.*
+*April 2026, working preprint.*
 
 ---
 
 ## Abstract
 
-We report a case study on the adversarial evaluation of a representative counter-UAV radar classifier — a CNN + LSTM architecture augmented with a hand-crafted Blade Flash Periodicity (BFP) feature, trained on synthetic 9.5 GHz FMCW micro-Doppler data across four target classes (multi-rotor drone, bird, fixed-wing UAV, manned aircraft). Two physically motivated attacks — blade-count reduction (A2) and pulse-and-glide flight (D2) — produce null results on the baseline model; accuracy does not drop. Permutation-importance and frequency-band masking show *why*: the classifier is not reading blade-flash harmonics or propeller micro-Doppler structure at all. It locates the bulk-Doppler peak and classifies from its position and amplitude, with the LSTM acting as a multi-instance aggregator rather than a temporal tracker. The BFP feature is used, but as a class-correlated noise distribution rather than as a physics measurement. We argue that *adversarial evaluation without feature attribution is unreliable*: attacks targeting features the classifier does not use produce null results that are easy to misread as robustness. We propose an attribution-first workflow as a prerequisite for credible adversarial evaluation of radar ML, and release all code and data to support replication.
+We report a case study on the adversarial evaluation of a representative counter-UAV radar classifier, a CNN + LSTM architecture augmented with a hand-crafted Blade Flash Periodicity (BFP) feature, trained on synthetic 9.5 GHz FMCW micro-Doppler data across four target classes (multi-rotor drone, bird, fixed-wing UAV, manned aircraft). Two physically motivated attacks, blade-count reduction (A2) and pulse-and-glide flight (D2), produce null results on the baseline model; accuracy does not drop. Permutation-importance and frequency-band masking show *why*: the classifier is not reading blade-flash harmonics or propeller micro-Doppler structure at all. It locates the bulk-Doppler peak and classifies from its position and amplitude, with the LSTM acting as a multi-instance aggregator rather than a temporal tracker. The BFP feature is used, but as a class-correlated noise distribution rather than as a physics measurement. We argue that *adversarial evaluation without feature attribution is unreliable*: attacks targeting features the classifier does not use produce null results that are easy to misread as robustness. We propose an attribution-first workflow as a prerequisite for credible adversarial evaluation of radar ML, and release all code and data to support replication.
 
 ---
 
 ## 1. Introduction
 
-Counter-UAV radar classifiers are moving from research prototypes into operational deployment. Vendors claim robustness on the basis of adversarial evaluation — typically a small set of physically motivated attacks run against the classifier, with accuracy reported as the outcome. A null result (accuracy holds) is read as evidence of robustness.
+Counter-UAV radar classifiers are moving from research prototypes into operational deployment. Vendors claim robustness on the basis of adversarial evaluation, typically a small set of physically motivated attacks run against the classifier, with accuracy reported as the outcome. A null result (accuracy holds) is read as evidence of robustness.
 
 This paper documents a case where that reading is wrong. We train a baseline classifier that matches the architectural pattern commonly published in the counter-UAV ML literature (CNN + LSTM + physics-informed hand-crafted feature), stress it with two physically motivated attacks designed around the propeller micro-Doppler physics the architecture claims to analyse, and find that neither attack moves accuracy. The reason is not robustness: feature-attribution measurements show the classifier never reads the features the attacks are designed to disturb.
 
@@ -77,11 +77,11 @@ On held-out synthetic data the full model reaches 88.9% accuracy (the original p
 
 We run two attacks. Both were designed against the physics the architecture claims to analyse. Both produce null results. For attack implementations see `adversarial/attack_a2_fewer_blades.py` and `adversarial/attack_d2_pulse_glide.py`.
 
-### 3.1 A2 — blade-count reduction
+### 3.1 A2: blade-count reduction
 
 Drones with single-blade propellers (with counterweights) are physically realistic and reduce the blade-flash fundamental frequency by a factor of two. Combined with reduced RPM, the blade-flash fundamental can be pushed into the bird-wingbeat band (5–20 Hz), which should destroy BFP as a discriminator. Six variants test the gradient from "clean 2-blade control" to "1-blade, 800 RPM, BFP matches typical bird flap."
 
-Result: accuracy on the drone class stays between 83.3% and 89.3% across all variants — indistinguishable from the unmasked baseline. Pushing BFP into the bird range does not push predictions toward bird.
+Result: accuracy on the drone class stays between 83.3% and 89.3% across all variants, indistinguishable from the unmasked baseline. Pushing BFP into the bird range does not push predictions toward bird.
 
 ![Figure 2: Attack A2 accuracy across variants](fig2_a2.png)
 
@@ -93,11 +93,11 @@ An ablation on the BFP feature itself explains this. On clean drone data, the au
 
 **Figure 3.** The measured BFP feature is numerically decoupled from the physics it claims to measure. Green bars show the physical blade-flash frequency computed from ground-truth blade count and RPM; grey bars show the mean output of the BFP extractor across 100 samples at each configuration. Extractor output remains in a narrow ~30–45 Hz band regardless of whether ground truth is 13 Hz or 167 Hz.
 
-### 3.2 D2 — pulse-and-glide
+### 3.2 D2: pulse-and-glide
 
 Drones that alternate powered and unpowered flight segments present a classifier with input sequences in which a fraction of frames contain body-echo only (no propeller content). We vary the "glide ratio" from 0 (all frames have propeller content) to 1.0 (every frame in the 10-frame LSTM window is glide-only). Frame order is randomised within each sequence.
 
-Result: accuracy on the drone class stays in the 80.0%–89.3% band across all glide ratios. Even when every frame in every sequence contains zero propeller content — only body echo at bulk Doppler — the classifier still labels the sample as drone 81.3% of the time.
+Result: accuracy on the drone class stays in the 80.0%–89.3% band across all glide ratios. Even when every frame in every sequence contains zero propeller content, only body echo at bulk Doppler, the classifier still labels the sample as drone 81.3% of the time.
 
 ![Figure 4: Attack D2 accuracy across glide ratios](fig4_d2.png)
 
@@ -111,7 +111,7 @@ To resolve what the classifier *is* using, we run permutation-importance and reg
 
 | Perturbation                                  | Accuracy | Drop (pp) |
 |:----------------------------------------------|:--------:|:---------:|
-| *(clean baseline)*                            | 88.9%    | —         |
+| *(clean baseline)*                            | 88.9%    | -         |
 | Spectrogram permutation across samples        | 47.7%    | +41.2     |
 | BFP permutation across samples                | 51.0%    | +37.9     |
 | Frequency mask: outer 50% of bins             | 55.6%    | +33.3     |
@@ -121,9 +121,9 @@ To resolve what the classifier *is* using, we run permutation-importance and reg
 
 ![Figure 5: Feature attribution results](fig5_attr.png)
 
-**Figure 5.** Feature attribution results, sorted by impact. Grey bars indicate tests that leave accuracy unchanged — frame order and within-frame time axis. Coloured bars indicate load-bearing features: frequency-band content and BFP distributional fingerprint. Note that the two frequency-mask tests are geometrically confounded because bulk-Doppler energy for different classes lives in different Doppler bands (see text).
+**Figure 5.** Feature attribution results, sorted by impact. Grey bars indicate tests that leave accuracy unchanged: frame order and within-frame time axis. Coloured bars indicate load-bearing features: frequency-band content and BFP distributional fingerprint. Note that the two frequency-mask tests are geometrically confounded because bulk-Doppler energy for different classes lives in different Doppler bands (see text).
 
-Three things stand out. First, frame order does not matter (−1.6 pp; within run-to-run noise). The LSTM functions as a multi-instance aggregator, not a temporal tracker — consistent with a separate data-leakage test we ran early in the project. Second, half the time axis can be zeroed with zero accuracy impact. The within-frame temporal structure — which is where blade-flash periodicity lives — is redundant. Third, BFP permutation causes a 38 pp drop, which at first appears to contradict A2. It does not. BFP values have class-correlated *distributions* (a noisy 45 Hz cluster for drones, a different noisy cluster for birds, and so on); shuffling the vectors across classes hands the classifier BFP values drawn from the wrong class. The classifier learns the distributional fingerprint of BFP noise, not the physical quantity BFP is supposed to measure.
+Three things stand out. First, frame order does not matter (−1.6 pp; within run-to-run noise). The LSTM functions as a multi-instance aggregator, not a temporal tracker, consistent with a separate data-leakage test we ran early in the project. Second, half the time axis can be zeroed with zero accuracy impact. The within-frame temporal structure, which is where blade-flash periodicity lives, is redundant. Third, BFP permutation causes a 38 pp drop, which at first appears to contradict A2. It does not. BFP values have class-correlated *distributions* (a noisy 45 Hz cluster for drones, a different noisy cluster for birds, and so on); shuffling the vectors across classes hands the classifier BFP values drawn from the wrong class. The classifier learns the distributional fingerprint of BFP noise, not the physical quantity BFP is supposed to measure.
 
 The frequency-band masks need care. At 9.5 GHz with PRF 8.33 kHz, each of the 128 Doppler bins is ~65 Hz wide. Drones at 10–20 m/s have bulk-Doppler peaks between 633 and 1267 Hz, which puts them at the *edge* of the central 25% band. Aircraft at 50–100 m/s have bulk-Doppler peaks outside the central 50% region entirely. So the two masks do not cleanly separate "bulk Doppler" from "micro-Doppler sidebands"; they separate classes with different bulk-kinematic ranges.
 
@@ -131,9 +131,9 @@ Reconciled with D2, the simplest account that fits all three pieces of evidence 
 
 ## 5. Discussion: why evaluation needs attribution first
 
-The paper's central observation is that both attacks were designed around the same incorrect premise — that the classifier's architecture reflects the features it uses. The architecture advertises blade-flash periodicity analysis, temporal tracking across frames, and spectrogram micro-Doppler analysis. A feature-attribution measurement beforehand would have shown that the LSTM is not temporal, the in-frame time axis is redundant, the BFP feature is noise, and the classifier's accuracy reduces to a bulk-Doppler peak locator.
+The paper's central observation is that both attacks were designed around the same incorrect premise: that the classifier's architecture reflects the features it uses. The architecture advertises blade-flash periodicity analysis, temporal tracking across frames, and spectrogram micro-Doppler analysis. A feature-attribution measurement beforehand would have shown that the LSTM is not temporal, the in-frame time axis is redundant, the BFP feature is noise, and the classifier's accuracy reduces to a bulk-Doppler peak locator.
 
-Two specific failure modes follow. First, a null result on A2 was initially easy to read as "the classifier is robust to blade-count manipulation." The correct reading is "the attack modified a feature the classifier does not use." Second, a null result on D2 initially suggested that micro-Doppler as a whole is inert inside the classifier. Attribution refines that: the classifier does use the *frequency band* in which drone propeller energy lives, but it uses the band's overall position and shape — not the harmonic structure that D2 disturbs.
+Two specific failure modes follow. First, a null result on A2 was initially easy to read as "the classifier is robust to blade-count manipulation." The correct reading is "the attack modified a feature the classifier does not use." Second, a null result on D2 initially suggested that micro-Doppler as a whole is inert inside the classifier. Attribution refines that: the classifier does use the *frequency band* in which drone propeller energy lives, but it uses the band's overall position and shape, not the harmonic structure that D2 disturbs.
 
 For adversarial evaluation of radar classifiers, we therefore propose the following order of operations:
 
