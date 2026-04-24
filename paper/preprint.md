@@ -1,6 +1,6 @@
 # Feature-Attribution-First Adversarial Evaluation of a Physics-Informed Counter-UAV Radar Classifier
 
-**Divya Kumar Jitendra Patel**
+**Divya Kumar Patel**
 Indian Institute of Technology, Madras
 `divyakumarpatel202@gmail.com`
 

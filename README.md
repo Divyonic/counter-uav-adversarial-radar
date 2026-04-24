@@ -1,6 +1,6 @@
 # Counter-UAV Radar: Attribution-First Adversarial Evaluation
 
-**Author:** Divya Kumar Jitendra Patel, Indian Institute of Technology, Madras
+**Author:** Divya Kumar Patel, Indian Institute of Technology, Madras
 **Contact:** `divyakumarpatel202@gmail.com`
 
 This repository documents a single case study on how counter-UAV radar ML classifiers should be evaluated for adversarial robustness. We start from a representative CNN + LSTM + physics-informed classifier, run two physically motivated attacks, find null results, and then show through feature attribution that the attacks were targeting features the classifier never used.
@@ -104,7 +104,7 @@ The repository is archived in its current state. The preprint is a short working
 If this work is useful, please cite:
 
 ```
-Patel, D.K.J. (2026). Feature-Attribution-First Adversarial Evaluation
+Divya Kumar Patel (2026). Feature-Attribution-First Adversarial Evaluation
 of a Physics-Informed Counter-UAV Radar Classifier. Working preprint,
 Indian Institute of Technology Madras.
 https://github.com/Divyonic/counter-uav-adversarial-radar
@@ -118,5 +118,5 @@ MIT, see [`LICENSE`](LICENSE).
 
 ## Contact
 
-Divya Kumar Jitendra Patel
+Divya Kumar Patel
 `divyakumarpatel202@gmail.com`
