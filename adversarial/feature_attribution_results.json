@@ -1,0 +1,53 @@
+{
+  "baseline_clean_accuracy": 0.8888888888888888,
+  "tests": {
+    "bfp_permutation": {
+      "test": "BFP permutation (across samples)",
+      "mean_acc": 0.5097222222222222,
+      "std_acc": 0.031242282997783297,
+      "n_trials": 5,
+      "accuracy_drop_pp": 37.916666666666664,
+      "relative_drop": 0.4265624995201172
+    },
+    "spectrogram_permutation": {
+      "test": "Spectrogram permutation (across samples)",
+      "mean_acc": 0.47685185185185186,
+      "std_acc": 0.01822687007873105,
+      "n_trials": 3,
+      "accuracy_drop_pp": 41.203703703703695,
+      "relative_drop": 0.4635416661451823
+    },
+    "frame_order_shuffle": {
+      "test": "Frame-order permutation within sequence",
+      "mean_acc": 0.9050925925925926,
+      "std_acc": 0.008661243950865575,
+      "n_trials": 3,
+      "accuracy_drop_pp": -1.620370370370372,
+      "relative_drop": -0.018229166646158874
+    },
+    "bulk_doppler_mask": {
+      "test": "Bulk-Doppler mask (central 25% freq band)",
+      "mean_acc": 0.7291666666666666,
+      "std_acc": 0.0,
+      "n_trials": 1,
+      "accuracy_drop_pp": 15.972222222222221,
+      "relative_drop": 0.17968749979785156
+    },
+    "micro_doppler_mask": {
+      "test": "Micro-Doppler mask (outer 50% freq band)",
+      "mean_acc": 0.5555555555555556,
+      "std_acc": 0.0,
+      "n_trials": 1,
+      "accuracy_drop_pp": 33.33333333333333,
+      "relative_drop": 0.37499999957812497
+    },
+    "temporal_mask": {
+      "test": "Temporal mask (central 50% time band)",
+      "mean_acc": 0.8888888888888888,
+      "std_acc": 0.0,
+      "n_trials": 1,
+      "accuracy_drop_pp": 0.0,
+      "relative_drop": 0.0
+    }
+  }
+}

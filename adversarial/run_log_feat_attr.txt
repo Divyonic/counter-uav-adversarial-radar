@@ -1,0 +1,56 @@
+(seed=42)
+======================================================================
+Training baseline CNN+LSTM+BFP (one time, reused for all tests)
+======================================================================
+Generating dataset: 300 samples/class, SNR=15 dB
+  Generating Enemy Drone... done
+  Generating Bird... done
+  Generating Friendly UAV... done
+  Generating Manned Aircraft... done
+    Epoch 10: loss=0.1472, val_acc=1.0000
+    Early stopping at epoch 18
+Clean baseline accuracy: 0.8889
+
+======================================================================
+Running feature attribution tests...
+======================================================================
+
+  bfp_permutation...
+    BFP permutation (across samples)
+    Accuracy: 0.5097 ± 0.0312  (drop: +37.92pp, +42.7%)
+
+  spectrogram_permutation...
+    Spectrogram permutation (across samples)
+    Accuracy: 0.4769 ± 0.0182  (drop: +41.20pp, +46.4%)
+
+  frame_order_shuffle...
+    Frame-order permutation within sequence
+    Accuracy: 0.9051 ± 0.0087  (drop: -1.62pp, -1.8%)
+
+  bulk_doppler_mask...
+    Bulk-Doppler mask (central 25% freq band)
+    Accuracy: 0.7292 ± 0.0000  (drop: +15.97pp, +18.0%)
+
+  micro_doppler_mask...
+    Micro-Doppler mask (outer 50% freq band)
+    Accuracy: 0.5556 ± 0.0000  (drop: +33.33pp, +37.5%)
+
+  temporal_mask...
+    Temporal mask (central 50% time band)
+    Accuracy: 0.8889 ± 0.0000  (drop: +0.00pp, +0.0%)
+
+Results saved to /Users/drexonindustries/experiments/counter_uav/results/feature_attribution_results.json
+
+======================================================================
+SUMMARY — feature importance (larger drop = more important)
+======================================================================
+Baseline clean accuracy: 0.8889
+
+Test                                          Masked Acc   Drop (pp)   
+---------------------------------------------------------------------
+Spectrogram permutation (across samples)      0.4769       +41.20
+BFP permutation (across samples)              0.5097       +37.92
+Micro-Doppler mask (outer 50% freq band)      0.5556       +33.33
+Bulk-Doppler mask (central 25% freq band)     0.7292       +15.97
+Temporal mask (central 50% time band)         0.8889       +0.00
+Frame-order permutation within sequence       0.9051       -1.62
