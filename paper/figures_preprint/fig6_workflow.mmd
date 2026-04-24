@@ -1,0 +1,10 @@
+flowchart TD
+    A["Train classifier"] --> B["Feature attribution<br/>permutation importance<br/>+ region masking"]
+    B --> C{"Which features<br/>does the classifier<br/>actually use?"}
+    C -->|Identified| D["Design attacks<br/>against used features"]
+    D --> E["Run attacks"]
+    E --> F["Report attack results<br/>+ attribution that justified<br/>the design"]
+    G["Traditional approach:<br/>design attacks against<br/>assumed physics"] -.-> H["Run attacks"]
+    H -.-> I["Null result ⇒<br/>uninterpretable"]
+    style I fill:#fee2e2
+    style F fill:#dcfce7

@@ -1,0 +1,12 @@
+flowchart LR
+    A["FMCW chirp<br/>9.5 GHz, 1 GHz BW"] --> B["Target echo<br/>+ micro-Doppler"]
+    B --> C["Beat signal<br/>128 × 128"]
+    C --> D["STFT spectrogram<br/>(128 × 128, 10 frames)"]
+    C --> E["BFP extractor<br/>autocorrelation → 3-vec"]
+    D --> F["CNN<br/>4 conv blocks"]
+    F --> G["LSTM<br/>10 frames × 64 units"]
+    E --> H["Concat + Softmax"]
+    G --> H
+    H --> I{"Drone / Bird /<br/>Fixed-wing UAV /<br/>Aircraft"}
+    style E fill:#fef3c7
+    style H fill:#dbeafe
