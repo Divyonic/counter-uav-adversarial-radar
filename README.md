@@ -2,15 +2,18 @@
 
 > A case study on why null results from adversarial evaluations of counter-UAV radar classifiers can be uninterpretable without feature attribution, and what to do about it.
 
+[![CI](https://github.com/Divyonic/counter-uav-adversarial-radar/actions/workflows/ci.yml/badge.svg)](https://github.com/Divyonic/counter-uav-adversarial-radar/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3](https://img.shields.io/badge/python-3.9%2B-blue)](requirements.txt)
 [![Framework: PyTorch](https://img.shields.io/badge/framework-PyTorch-ee4c2c)](https://pytorch.org/)
 [![Paper: PDF](https://img.shields.io/badge/paper-preprint.pdf-red)](paper/preprint.pdf)
+[![Notebook: demo](https://img.shields.io/badge/demo-notebook-f37626?logo=jupyter)](notebooks/demo.ipynb)
 [![Status: Working Preprint](https://img.shields.io/badge/status-working%20preprint-lightgrey)](paper/preprint.md)
 
 **Author:** Divya Kumar Jitendra Patel, Indian Institute of Technology Madras
 **Contact:** `divyakumarpatel202@gmail.com`
 **Preprint:** [`paper/preprint.md`](paper/preprint.md) &middot; [`paper/preprint.pdf`](paper/preprint.pdf)
+**Demo notebook:** [`notebooks/demo.ipynb`](notebooks/demo.ipynb) (runs in under a minute, no GPU)
 
 ---
 
@@ -177,7 +180,10 @@ git clone https://github.com/Divyonic/counter-uav-adversarial-radar.git
 cd counter-uav-adversarial-radar
 pip install -r requirements.txt
 
-# Reproduce every result in the paper, in order (~45 min CPU):
+# Browse the whole story in a single notebook (under a minute, no GPU):
+jupyter notebook notebooks/demo.ipynb
+
+# Or reproduce every result in the paper from scratch (~45 min CPU):
 python3 baseline/train_and_evaluate.py       # baseline CNN / CNN+BFP / CNN+LSTM+BFP
 python3 baseline/leakage_test.py             # diagnostic: is LSTM really temporal?
 python3 adversarial/attack_a2_fewer_blades.py
@@ -186,6 +192,15 @@ python3 adversarial/feature_attribution.py
 ```
 
 Each script is self-contained. Random seeds are pinned. Re-running produces byte-identical results (up to CPU-specific floating-point variation).
+
+### Tests
+
+```bash
+pip install pytest
+pytest tests/ -v
+```
+
+21 tests covering the simulator shapes and determinism, model forward passes, the BFP-is-noise regression guard, and results-JSON integrity. CI runs on every push across Python 3.9-3.12.
 
 ---
 
@@ -197,6 +212,9 @@ counter-uav-adversarial-radar/
 │   ├── preprint.md                  Main paper, Markdown with embedded charts
 │   ├── preprint.pdf                 Rendered PDF, 8 pages, arXiv-ready
 │   └── figures_preprint/            Figure sources (PNG + Mermaid .mmd)
+├── notebooks/
+│   ├── demo.ipynb                   Interactive walk-through, plots inline
+│   └── build_demo.py                Programmatic source for demo.ipynb
 ├── baseline/
 │   ├── fmcw_simulation.py           FMCW radar signal generator + spectrogram + BFP
 │   ├── model.py                     CNN / CNN+BFP / CNN+LSTM+BFP architectures
@@ -204,15 +222,20 @@ counter-uav-adversarial-radar/
 │   ├── leakage_test.py              Diagnostic: randomise per-frame params
 │   ├── herm_extractor.py            Alternative HERM-based feature (null result)
 │   └── results/                     Baseline experiment JSON outputs
-└── adversarial/
-    ├── attack_a2_fewer_blades.py    Attack A2: variable blade count x RPM
-    ├── attack_d2_pulse_glide.py     Attack D2: variable pulse-and-glide ratio
-    ├── feature_attribution.py       Permutation importance + region masking
-    ├── FINDINGS_A2.md               Results write-up: A2 null result
-    ├── FINDINGS_D2.md               Results write-up: D2 null result
-    ├── FINDINGS_attribution.md      Results write-up: what the classifier uses
-    ├── *_results.json               Raw experiment outputs
-    └── run_log_*.txt                Full stdout logs
+├── adversarial/
+│   ├── attack_a2_fewer_blades.py    Attack A2: variable blade count x RPM
+│   ├── attack_d2_pulse_glide.py     Attack D2: variable pulse-and-glide ratio
+│   ├── feature_attribution.py       Permutation importance + region masking
+│   ├── FINDINGS_A2.md               Results write-up: A2 null result
+│   ├── FINDINGS_D2.md               Results write-up: D2 null result
+│   ├── FINDINGS_attribution.md      Results write-up: what the classifier uses
+│   ├── *_results.json               Raw experiment outputs
+│   └── run_log_*.txt                Full stdout logs
+├── tests/                           pytest suite, runs in ~2 seconds
+│   ├── test_fmcw_simulation.py      Simulator shapes, determinism, BFP regression
+│   ├── test_model.py                Classifier forward passes, parameter counts
+│   └── test_results_integrity.py    Guards against silent findings drift
+└── .github/workflows/ci.yml         CI: pytest + ruff, Python 3.9-3.12
 ```
 
 ---
