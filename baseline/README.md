@@ -1,24 +1,22 @@
 # Baseline Counter-UAV Classifier
 
-End-to-end FMCW radar + CNN + LSTM pipeline for drone / bird / fixed-wing UAV / manned aircraft classification.
+End-to-end FMCW radar + CNN + LSTM pipeline for drone / bird / fixed-wing UAV / manned aircraft classification. This is the classifier that the adversarial experiments in `../adversarial/` probe.
 
 ## Files
 
-| File                          | Purpose                                                        |
-|-------------------------------|----------------------------------------------------------------|
-| `fmcw_simulation.py`          | Synthetic FMCW signal generation, 2D-FFT, STFT, CFAR, BFP      |
-| `model.py`                    | CNN, CNN+BFP, CNN+LSTM+BFP architectures (PyTorch)             |
-| `train_and_evaluate.py`       | Full training + evaluation pipeline; writes `results/`          |
-| `leakage_test.py`             | Diagnostic: retrains with per-frame randomised parameters      |
-| `generate_figures.py`         | Renders figures from `results/experiment_results.json`          |
-| `generate_improved_figures.py`| Updated figure rendering                                       |
+| File                    | Purpose                                                   |
+|:------------------------|:----------------------------------------------------------|
+| `fmcw_simulation.py`    | Synthetic FMCW signal generation, 2D-FFT, STFT, CFAR, BFP |
+| `model.py`              | CNN, CNN+BFP, CNN+LSTM+BFP architectures (PyTorch)        |
+| `train_and_evaluate.py` | Full training + evaluation pipeline; writes `results/`    |
+| `leakage_test.py`       | Diagnostic: retrains with per-frame randomised parameters |
+| `herm_extractor.py`     | Alternative HERM-based feature extractor (null result)    |
 
 ## Run
 
 ```bash
 python3 train_and_evaluate.py         # ~5-15 min on CPU
 python3 leakage_test.py               # ~3-10 min on CPU
-python3 generate_improved_figures.py
 ```
 
 ## FMCW radar parameters
@@ -39,4 +37,4 @@ python3 generate_improved_figures.py
 
 ## Known issues
 
-See top-level `README.md` for a list of known methodological limitations in the baseline paper, including the suspected data-leakage issue that motivated the adversarial-robustness research direction.
+See top-level `README.md` for the list of known methodological limitations, including the suspected data-leakage issue that motivated the adversarial-robustness research direction.

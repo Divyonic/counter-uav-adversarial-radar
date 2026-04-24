@@ -14,8 +14,7 @@ See the top-level preprint in `../paper/preprint.md` for the full methodology ar
 
 **Script:** `attack_a2_fewer_blades.py`
 **Write-up:** `FINDINGS_A2.md`
-**Raw results:** `attack_a2_results.json`, `attack_a2_results_seed42.json`, `attack_a2_results_seed123.json`
-**Run logs:** `run_log_seed42.txt`, `run_log_seed123.txt`
+**Raw results:** `attack_a2_results.json`
 
 Six variants spanning the gradient from "clean 2-blade control" to "1-blade, 800 RPM, BFP at typical bird-flap frequency." Hypothesis: pushing the blade-flash fundamental into the bird band should destroy BFP as a discriminator and force bird misclassification.
 

@@ -26,26 +26,25 @@ The full write-up is in [`paper/preprint.md`](paper/preprint.md).
 ```
 counter-uav-adversarial-radar/
 ├── paper/
-│   ├── preprint.md                       Main paper (short, attribution-first methodology argument)
-│   ├── counter_uav_fmcw_cnn_lstm.md      Earlier baseline paper (longer, classifier-focused)
-│   └── figures/                           Figures from the baseline paper
+│   ├── preprint.md                       Main paper, attribution-first methodology argument
+│   ├── preprint.pdf                      Rendered PDF of the preprint
+│   └── figures_preprint/                 Figure sources (Mermaid .mmd + PNG) for the PDF
 ├── baseline/
-│   ├── fmcw_simulation.py                 FMCW radar signal generator + spectrogram + BFP extractor
-│   ├── model.py                           CNN / CNN+BFP / CNN+LSTM+BFP architectures
-│   ├── train_and_evaluate.py              Training and evaluation pipeline
-│   ├── leakage_test.py                    Diagnostic: randomises per-frame params to test LSTM is temporal
-│   ├── herm_extractor.py                  Alternative HERM-based feature extractor (null result)
-│   ├── results/                           Experiment output JSONs
-│   └── figures/                           Rendered figures
+│   ├── fmcw_simulation.py                FMCW radar signal generator, spectrogram, BFP extractor
+│   ├── model.py                          CNN, CNN+BFP, CNN+LSTM+BFP architectures
+│   ├── train_and_evaluate.py             Training and evaluation pipeline
+│   ├── leakage_test.py                   Diagnostic: randomises per-frame params to test LSTM is temporal
+│   ├── herm_extractor.py                 Alternative HERM-based feature extractor (null result)
+│   └── results/                          Baseline experiment JSON outputs
 └── adversarial/
-    ├── README.md                          Attack-by-attack catalogue and status
-    ├── attack_a2_fewer_blades.py          Attack A2: variable blade count × RPM
-    ├── attack_d2_pulse_glide.py           Attack D2: variable pulse-and-glide ratio
-    ├── feature_attribution.py             Permutation importance + region masking
-    ├── FINDINGS_A2.md                     Results write-up: A2 null result
-    ├── FINDINGS_D2.md                     Results write-up: D2 null result
-    ├── FINDINGS_attribution.md            Results write-up: what the classifier actually uses
-    └── *_results.json, run_log_*.txt      Raw experiment outputs
+    ├── README.md                         Experiment-by-experiment catalogue
+    ├── attack_a2_fewer_blades.py         Attack A2: variable blade count × RPM
+    ├── attack_d2_pulse_glide.py          Attack D2: variable pulse-and-glide ratio
+    ├── feature_attribution.py            Permutation importance + region masking
+    ├── FINDINGS_A2.md                    Results write-up: A2 null result
+    ├── FINDINGS_D2.md                    Results write-up: D2 null result
+    ├── FINDINGS_attribution.md           Results write-up: what the classifier actually uses
+    └── *_results.json, run_log_*.txt     Raw experiment outputs
 ```
 
 ---
