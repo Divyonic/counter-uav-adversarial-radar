@@ -1,10 +1,35 @@
+%%{init: {
+  "theme": "base",
+  "themeVariables": {
+    "fontFamily": "system-ui, -apple-system, Segoe UI, sans-serif",
+    "fontSize": "15px",
+    "primaryColor": "#e0f2fe",
+    "primaryBorderColor": "#0369a1",
+    "primaryTextColor": "#0c4a6e",
+    "lineColor": "#475569",
+    "edgeLabelBackground": "#ffffff"
+  },
+  "flowchart": {"curve": "basis", "nodeSpacing": 44, "rankSpacing": 52, "padding": 14}
+}}%%
 flowchart TD
-    A["Train classifier"] --> B["Feature attribution<br/>permutation importance<br/>+ region masking"]
-    B --> C{"Which features<br/>does the classifier<br/>actually use?"}
-    C -->|Identified| D["Design attacks<br/>against used features"]
-    D --> E["Run attacks"]
-    E --> F["Report attack results<br/>+ attribution that justified<br/>the design"]
-    G["Traditional approach:<br/>design attacks against<br/>assumed physics"] -.-> H["Run attacks"]
-    H -.-> I["Null result ⇒<br/>uninterpretable"]
-    style I fill:#fee2e2
-    style F fill:#dcfce7
+    A["Train classifier"]
+    B["Feature attribution<br/><span style='font-size:12px;color:#555'>permutation importance · region masking</span>"]
+    C{"Which features<br/>does the classifier<br/>actually use?"}
+    D["Design attacks<br/><span style='font-size:12px;color:#555'>against used features</span>"]
+    E["Run attacks"]
+    F["Report attack results<br/>+ attribution<br/>that justified the design"]
+
+    G["Traditional approach:<br/><span style='font-size:12px;color:#555'>design attacks against<br/>assumed physics</span>"]
+    H["Run attacks"]
+    I["Null result<br/>(uninterpretable)"]
+
+    A --> B --> C
+    C -->|identified| D --> E --> F
+    G -.-> H -.-> I
+
+    classDef good fill:#dcfce7,stroke:#15803d,stroke-width:1.5px,color:#14532d
+    classDef bad fill:#fee2e2,stroke:#b91c1c,stroke-width:1.5px,color:#7f1d1d
+    classDef highlight fill:#fef3c7,stroke:#d97706,stroke-width:1.5px,color:#78350f
+    class F good
+    class I bad
+    class B highlight
