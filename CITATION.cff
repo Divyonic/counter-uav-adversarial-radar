@@ -1,0 +1,32 @@
+cff-version: 1.2.0
+message: "If you use this work, please cite it as below."
+type: software
+title: "Feature-Attribution-First Adversarial Evaluation of a Physics-Informed Counter-UAV Radar Classifier"
+abstract: >-
+  A case study on a representative CNN + LSTM + BFP counter-UAV radar
+  classifier. Two physically motivated adversarial attacks (blade-count
+  reduction, pulse-and-glide flight) produce null results on synthetic
+  9.5 GHz FMCW data. Feature-attribution measurements show the
+  classifier does not use the features the attacks target. An
+  attribution-first workflow is proposed as a prerequisite for
+  credible adversarial evaluation of radar ML.
+authors:
+  - given-names: "Divya Kumar Jitendra"
+    family-names: "Patel"
+    affiliation: "Indian Institute of Technology Madras"
+    email: "divyakumarpatel202@gmail.com"
+repository-code: "https://github.com/Divyonic/counter-uav-adversarial-radar"
+url: "https://github.com/Divyonic/counter-uav-adversarial-radar"
+license: MIT
+version: "1.0.0"
+date-released: "2026-04-24"
+keywords:
+  - "counter-UAV"
+  - "radar"
+  - "micro-Doppler"
+  - "adversarial robustness"
+  - "feature attribution"
+  - "FMCW"
+  - "shortcut learning"
+  - "CNN"
+  - "LSTM"
