@@ -47,6 +47,23 @@ Class kinematic distributions:
 
 A 4-block CNN extracts per-frame spectrogram features (~0.45M parameters). A 2-layer LSTM aggregates across the 10 frames. The final hidden state is concatenated with a 3-dimensional BFP feature vector computed via autocorrelation of the temporal envelope (code in `baseline/model.py`). A softmax head produces class probabilities.
 
+```mermaid
+flowchart LR
+    A["FMCW chirp<br/>9.5 GHz, 1 GHz BW"] --> B["Target echo<br/>+ micro-Doppler"]
+    B --> C["Beat signal<br/>128 × 128"]
+    C --> D["STFT spectrogram<br/>(128 × 128, 10 frames)"]
+    C --> E["BFP extractor<br/>autocorrelation → 3-vec"]
+    D --> F["CNN<br/>4 conv blocks"]
+    F --> G["LSTM<br/>10 frames × 64 units"]
+    E --> H["Concat + Softmax"]
+    G --> H
+    H --> I{"Drone / Bird /<br/>Fixed-wing UAV /<br/>Aircraft"}
+    style E fill:#fef3c7
+    style H fill:#dbeafe
+```
+
+**Figure 1.** Baseline classifier pipeline. The spectrogram stream feeds a CNN + LSTM; the BFP physics feature is concatenated at the final classifier head.
+
 ### 2.3 Clean-data performance
 
 On held-out synthetic data the full model reaches 88.9% accuracy (the original paper cites 95.8% on a larger training set; we use a smaller set here for faster iteration). Per-class confusion aligns with class-kinematic separability: manned aircraft identified near-perfectly, multi-rotor vs bird hardest.
@@ -61,13 +78,25 @@ Drones with single-blade propellers (with counterweights) are physically realist
 
 Result: accuracy on the drone class stays between 83.3% and 89.3% across all variants — indistinguishable from the unmasked baseline. Pushing BFP into the bird range does not push predictions toward bird.
 
+![Attack A2 accuracy across variants](https://quickchart.io/chart?bkg=white&w=700&h=400&c=%7B%22type%22%3A%22bar%22%2C%22data%22%3A%7B%22labels%22%3A%5B%22Clean%20%282-blade%2C%205k%20RPM%29%22%2C%22A2%20%281-blade%2C%205k%29%22%2C%22A2%2BA1%20%281-blade%2C%203k%29%22%2C%22A2%2BA1%20%281-blade%2C%202k%29%22%2C%22A2%2BA1%20%281-blade%2C%201.2k%29%22%2C%22A2%2BA1%20%281-blade%2C%20800%29%22%5D%2C%22datasets%22%3A%5B%7B%22label%22%3A%22Drone-class%20accuracy%20%28%25%29%22%2C%22data%22%3A%5B82%2C87%2C91%2C79%2C89%2C85%5D%2C%22backgroundColor%22%3A%22%232563eb%22%7D%5D%7D%2C%22options%22%3A%7B%22title%22%3A%7B%22display%22%3Atrue%2C%22text%22%3A%22Attack%20A2%3A%20accuracy%20flat%20across%20variants%20%28null%20result%29%22%7D%2C%22scales%22%3A%7B%22yAxes%22%3A%5B%7B%22ticks%22%3A%7B%22min%22%3A0%2C%22max%22%3A100%2C%22stepSize%22%3A20%7D%2C%22scaleLabel%22%3A%7B%22display%22%3Atrue%2C%22labelString%22%3A%22Accuracy%20%28%25%29%22%7D%7D%5D%7D%7D%7D)
+
+**Figure 2.** A2 results. Blade-count reduction combined with RPM reduction was designed to push blade-flash frequency from 167 Hz down into the bird-wingbeat range (13–20 Hz). Accuracy does not drop.
+
 An ablation on the BFP feature itself explains this. On clean drone data, the autocorrelation-based BFP extractor returns 45 ± 59 Hz regardless of whether the physical ground truth is 13 Hz or 167 Hz. The feature is numerically noise. Classification accuracy is unchanged by A2 because the *measured* BFP was already unrelated to the physics the attack modifies.
+
+![BFP measurement is noise regardless of ground truth](https://quickchart.io/chart?bkg=white&w=700&h=400&c=%7B%22type%22%3A%22bar%22%2C%22data%22%3A%7B%22labels%22%3A%5B%22Clean%202-bld%205k%22%2C%22A2%201-bld%205k%22%2C%221-bld%203k%22%2C%221-bld%202k%22%2C%221-bld%201.2k%22%2C%221-bld%20800%22%5D%2C%22datasets%22%3A%5B%7B%22label%22%3A%22Ground%20truth%20BFP%20%28Hz%29%22%2C%22data%22%3A%5B167%2C83%2C50%2C33%2C20%2C13%5D%2C%22backgroundColor%22%3A%22%2316a34a%22%7D%2C%7B%22label%22%3A%22Measured%20BFP%20mean%20%28Hz%29%22%2C%22data%22%3A%5B45%2C35%2C42%2C32%2C34%2C45%5D%2C%22backgroundColor%22%3A%22%2364748b%22%7D%5D%7D%2C%22options%22%3A%7B%22title%22%3A%7B%22display%22%3Atrue%2C%22text%22%3A%22BFP%20extractor%20returns%20noise%20regardless%20of%20ground%20truth%22%7D%2C%22scales%22%3A%7B%22yAxes%22%3A%5B%7B%22ticks%22%3A%7B%22min%22%3A0%2C%22max%22%3A180%7D%2C%22scaleLabel%22%3A%7B%22display%22%3Atrue%2C%22labelString%22%3A%22BFP%20%28Hz%29%22%7D%7D%5D%7D%7D%7D)
+
+**Figure 3.** The measured BFP feature is numerically decoupled from the physics it claims to measure. Green bars show the physical blade-flash frequency computed from ground-truth blade count and RPM; grey bars show the mean output of the BFP extractor across 100 samples at each configuration. Extractor output remains in a narrow ~30–45 Hz band regardless of whether ground truth is 13 Hz or 167 Hz.
 
 ### 3.2 D2 — pulse-and-glide
 
 Drones that alternate powered and unpowered flight segments present a classifier with input sequences in which a fraction of frames contain body-echo only (no propeller content). We vary the "glide ratio" from 0 (all frames have propeller content) to 1.0 (every frame in the 10-frame LSTM window is glide-only). Frame order is randomised within each sequence.
 
 Result: accuracy on the drone class stays in the 80.0%–89.3% band across all glide ratios. Even when every frame in every sequence contains zero propeller content — only body echo at bulk Doppler — the classifier still labels the sample as drone 81.3% of the time.
+
+![Attack D2 accuracy across glide ratios](https://quickchart.io/chart?bkg=white&w=700&h=400&c=%7B%22type%22%3A%22bar%22%2C%22data%22%3A%7B%22labels%22%3A%5B%220%25%22%2C%2220%25%22%2C%2240%25%22%2C%2250%25%22%2C%2260%25%22%2C%2270%25%22%2C%2280%25%22%2C%2290%25%22%2C%22100%25%22%5D%2C%22datasets%22%3A%5B%7B%22label%22%3A%22Drone-class%20accuracy%20%28%25%29%22%2C%22data%22%3A%5B83.3%2C84.0%2C84.7%2C80.0%2C89.3%2C88.0%2C85.3%2C86.0%2C81.3%5D%2C%22backgroundColor%22%3A%22%23dc2626%22%7D%5D%7D%2C%22options%22%3A%7B%22title%22%3A%7B%22display%22%3Atrue%2C%22text%22%3A%22Attack%20D2%3A%20accuracy%20flat%20across%20glide%20ratios%20%28100%25%20glide%20still%2081%25%20drone%29%22%7D%2C%22scales%22%3A%7B%22yAxes%22%3A%5B%7B%22ticks%22%3A%7B%22min%22%3A0%2C%22max%22%3A100%2C%22stepSize%22%3A20%7D%2C%22scaleLabel%22%3A%7B%22display%22%3Atrue%2C%22labelString%22%3A%22Accuracy%20%28%25%29%22%7D%7D%5D%2C%22xAxes%22%3A%5B%7B%22scaleLabel%22%3A%7B%22display%22%3Atrue%2C%22labelString%22%3A%22Glide%20ratio%22%7D%7D%5D%7D%7D%7D)
+
+**Figure 4.** D2 results. Across nine glide ratios, including the extreme case where every frame in every LSTM window contains zero propeller content, classifier accuracy remains in the baseline band.
 
 This is a stronger outcome than A2. A2 could be explained by a noisy BFP extractor still driving a real feature. D2 removes propeller content from the signal itself, not just from the extracted feature. The classifier's drone decision clearly does not depend on propeller content at any level.
 
@@ -84,6 +113,10 @@ To resolve what the classifier *is* using, we run permutation-importance and reg
 | Frequency mask: central 25% of bins           | 72.9%    | +16.0     |
 | Temporal mask: central 50% of time bins       | 88.9%    | +0.0      |
 | Frame-order permutation within each sequence  | 90.5%    | −1.6      |
+
+![Feature attribution results](https://quickchart.io/chart?bkg=white&w=700&h=400&c=%7B%22type%22%3A%22horizontalBar%22%2C%22data%22%3A%7B%22labels%22%3A%5B%22Frame-order%20shuffle%22%2C%22Temporal%20mask%2050%25%22%2C%22Central%2025%25%20freq%20mask%22%2C%22Outer%2050%25%20freq%20mask%22%2C%22BFP%20permutation%22%2C%22Spectrogram%20permutation%22%5D%2C%22datasets%22%3A%5B%7B%22label%22%3A%22Accuracy%20drop%20%28pp%29%22%2C%22data%22%3A%5B-1.6%2C0.0%2C16.0%2C33.3%2C37.9%2C41.2%5D%2C%22backgroundColor%22%3A%5B%22%2394a3b8%22%2C%22%2394a3b8%22%2C%22%23eab308%22%2C%22%23f97316%22%2C%22%23dc2626%22%2C%22%237f1d1d%22%5D%7D%5D%7D%2C%22options%22%3A%7B%22title%22%3A%7B%22display%22%3Atrue%2C%22text%22%3A%22Feature%20attribution%3A%20larger%20drop%20%3D%20more%20important%22%7D%2C%22legend%22%3A%7B%22display%22%3Afalse%7D%2C%22scales%22%3A%7B%22xAxes%22%3A%5B%7B%22ticks%22%3A%7B%22min%22%3A-5%2C%22max%22%3A50%7D%2C%22scaleLabel%22%3A%7B%22display%22%3Atrue%2C%22labelString%22%3A%22Accuracy%20drop%20%28percentage%20points%29%22%7D%7D%5D%7D%7D%7D)
+
+**Figure 5.** Feature attribution results, sorted by impact. Grey bars indicate tests that leave accuracy unchanged — frame order and within-frame time axis. Coloured bars indicate load-bearing features: frequency-band content and BFP distributional fingerprint. Note that the two frequency-mask tests are geometrically confounded because bulk-Doppler energy for different classes lives in different Doppler bands (see text).
 
 Three things stand out. First, frame order does not matter (−1.6 pp; within run-to-run noise). The LSTM functions as a multi-instance aggregator, not a temporal tracker — consistent with a separate data-leakage test we ran early in the project. Second, half the time axis can be zeroed with zero accuracy impact. The within-frame temporal structure — which is where blade-flash periodicity lives — is redundant. Third, BFP permutation causes a 38 pp drop, which at first appears to contradict A2. It does not. BFP values have class-correlated *distributions* (a noisy 45 Hz cluster for drones, a different noisy cluster for birds, and so on); shuffling the vectors across classes hands the classifier BFP values drawn from the wrong class. The classifier learns the distributional fingerprint of BFP noise, not the physical quantity BFP is supposed to measure.
 
@@ -105,6 +138,21 @@ For adversarial evaluation of radar classifiers, we therefore propose the follow
 4. Report attack success alongside the attribution results that justify its design. A null result is uninterpretable in isolation.
 
 This is a lightweight addition to an existing evaluation. The cost (one run of permutation importance per architecture) is small relative to the cost of a full adversarial evaluation, and the resulting attacks are substantially more informative.
+
+```mermaid
+flowchart TD
+    A["Train classifier"] --> B["Feature attribution<br/>permutation importance<br/>+ region masking"]
+    B --> C{"Which features<br/>does the classifier<br/>actually use?"}
+    C -->|Identified| D["Design attacks<br/>against used features"]
+    D --> E["Run attacks"]
+    E --> F["Report attack results<br/>+ attribution that justified<br/>the design"]
+    G["Traditional approach:<br/>design attacks against<br/>assumed physics"] -.-> H["Run attacks"]
+    H -.-> I["Null result ⇒<br/>uninterpretable"]
+    style I fill:#fee2e2
+    style F fill:#dcfce7
+```
+
+**Figure 6.** The attribution-first workflow (solid arrows) contrasted with the traditional approach (dotted arrows). A null result from a traditional evaluation cannot distinguish classifier robustness from an attack targeting features the classifier does not use. Attribution-first evaluation produces attacks whose outcomes are interpretable regardless of whether they succeed or fail.
 
 ## 6. Limitations
 
