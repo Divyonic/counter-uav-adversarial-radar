@@ -61,7 +61,7 @@ I sketched a threat taxonomy, organised by which layer of the pipeline each atta
 
 Then I picked the most physically plausible attack to run first.
 
-### Attack A2 — fewer blades
+### Attack A2: fewer blades
 
 A drone with a single-blade propeller (counterweighted for balance) is a real, buildable modification. Combined with reduced RPM, the blade-flash fundamental frequency drops from around 167 Hz for a 2-blade 5000 RPM multi-rotor down to about 13 Hz, which is inside the typical bird-wingbeat band. If BFP is doing anything like the physics it claims to do, pushing the blade flash into bird range should push classifications toward bird.
 
@@ -71,7 +71,7 @@ I ran six variants: a clean 2-blade 5000 RPM control, then 1-blade at decreasing
 
 The first clue came from an ablation on BFP itself. On clean drone data, the autocorrelation-based BFP extractor returned 45 Hz plus or minus 59 Hz, independent of whether the ground-truth physics was 13 Hz or 167 Hz. The feature that was supposed to measure blade-flash frequency was returning a narrow, noisy, class-correlated distribution that had almost nothing to do with the actual physics. A2 changed the physics, but the BFP extractor wasn't reading the physics in the first place.
 
-### Attack D2 — pulse-and-glide
+### Attack D2: pulse-and-glide
 
 If BFP was noise, maybe the classifier was using the CNN to read harmonic structure directly from the spectrogram. A2 left harmonic structure intact; it just moved it down in frequency. A stronger attack would remove it entirely.
 
@@ -85,7 +85,7 @@ This was a substantially stronger null than A2. A2 could be hand-waved as a nois
 
 I stopped designing attacks and started measuring what the classifier actually used. Six tests, each perturbing a specific feature group on the held-out test set, each measuring the accuracy drop:
 
-1. **Shuffle frame order within each 10-frame sequence.** Accuracy dropped by 1.6 percentage points — noise. The LSTM does not use temporal order. This confirmed the earlier leakage-test finding: the LSTM is a multi-instance aggregator, not a temporal tracker.
+1. **Shuffle frame order within each 10-frame sequence.** Accuracy dropped by 1.6 percentage points, within noise. The LSTM does not use temporal order. This confirmed the earlier leakage-test finding: the LSTM is a multi-instance aggregator, not a temporal tracker.
 2. **Zero out the central 50 percent of the time axis within each frame.** Accuracy dropped by 0.0 percentage points. Half the temporal detail inside each frame is redundant to this classifier.
 3. **Zero the outer 50 percent of frequency bins.** 33 pp drop.
 4. **Zero the central 25 percent of frequency bins.** 16 pp drop.
@@ -94,7 +94,7 @@ I stopped designing attacks and started measuring what the classifier actually u
 
 Frame order: irrelevant. Time axis within a frame: mostly irrelevant. Spectrogram content: critical. BFP vector: critical.
 
-The BFP result looked like a contradiction at first. A2 changed the physics beneath BFP and nothing happened. Attribution showed BFP was load-bearing. How? The resolution is that BFP values have class-correlated distributions — the noisy 45-Hz cluster for drones is numerically different from the noisy cluster for birds even though neither cluster measures anything meaningful. Permuting BFP across classes gives the classifier BFP values drawn from the wrong class, which confuses it. The classifier learned the distributional fingerprint of BFP noise, not the physical quantity.
+The BFP result looked like a contradiction at first. A2 changed the physics beneath BFP and nothing happened. Attribution showed BFP was load-bearing. How? The resolution is that BFP values have class-correlated distributions: the noisy 45-Hz cluster for drones is numerically different from the noisy cluster for birds even though neither cluster measures anything meaningful. Permuting BFP across classes gives the classifier BFP values drawn from the wrong class, which confuses it. The classifier learned the distributional fingerprint of BFP noise, not the physical quantity.
 
 The frequency-band mask results needed careful interpretation. At 9.5 GHz with PRF 8.33 kHz, each of the 128 Doppler bins is 65 Hz wide. Drones at 10–20 m/s produce bulk-Doppler peaks between 633 Hz and 1267 Hz, sitting near the edge of the "central 25 percent" band. Aircraft at 50–100 m/s sit outside the central 50 percent entirely. So the two frequency masks do not cleanly separate bulk Doppler from micro-Doppler sidebands; they separate classes with different bulk-kinematic ranges. Both masks mostly affect the band where each class's bulk-Doppler peak happens to live.
 
