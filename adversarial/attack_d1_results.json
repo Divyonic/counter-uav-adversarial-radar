@@ -1,0 +1,95 @@
+{
+  "baseline_clean_test_accuracy": 0.8888888888888888,
+  "attacks": [
+    {
+      "attack_name": "D1_v_15_20",
+      "v_lo_mps": 15.0,
+      "v_hi_mps": 20.0,
+      "expected_doppler_lo_hz": 950.0,
+      "expected_doppler_hi_hz": 1266.6666666666667,
+      "n_samples": 150,
+      "accuracy_as_drone": 0.0,
+      "class_distribution": {
+        "Enemy Drone": 0,
+        "Bird": 0,
+        "Friendly UAV": 149,
+        "Manned Aircraft": 1
+      }
+    },
+    {
+      "attack_name": "D1_v_10_15",
+      "v_lo_mps": 10.0,
+      "v_hi_mps": 15.0,
+      "expected_doppler_lo_hz": 633.3333333333334,
+      "expected_doppler_hi_hz": 950.0,
+      "n_samples": 150,
+      "accuracy_as_drone": 0.20666666666666667,
+      "class_distribution": {
+        "Enemy Drone": 31,
+        "Bird": 119,
+        "Friendly UAV": 0,
+        "Manned Aircraft": 0
+      }
+    },
+    {
+      "attack_name": "D1_v_8_12",
+      "v_lo_mps": 8.0,
+      "v_hi_mps": 12.0,
+      "expected_doppler_lo_hz": 506.6666666666667,
+      "expected_doppler_hi_hz": 760.0,
+      "n_samples": 150,
+      "accuracy_as_drone": 0.26666666666666666,
+      "class_distribution": {
+        "Enemy Drone": 40,
+        "Bird": 110,
+        "Friendly UAV": 0,
+        "Manned Aircraft": 0
+      }
+    },
+    {
+      "attack_name": "D1_v_5_10",
+      "v_lo_mps": 5.0,
+      "v_hi_mps": 10.0,
+      "expected_doppler_lo_hz": 316.6666666666667,
+      "expected_doppler_hi_hz": 633.3333333333334,
+      "n_samples": 150,
+      "accuracy_as_drone": 0.4533333333333333,
+      "class_distribution": {
+        "Enemy Drone": 68,
+        "Bird": 82,
+        "Friendly UAV": 0,
+        "Manned Aircraft": 0
+      }
+    },
+    {
+      "attack_name": "D1_v_5_8",
+      "v_lo_mps": 5.0,
+      "v_hi_mps": 8.0,
+      "expected_doppler_lo_hz": 316.6666666666667,
+      "expected_doppler_hi_hz": 506.6666666666667,
+      "n_samples": 150,
+      "accuracy_as_drone": 0.2866666666666667,
+      "class_distribution": {
+        "Enemy Drone": 43,
+        "Bird": 102,
+        "Friendly UAV": 0,
+        "Manned Aircraft": 5
+      }
+    },
+    {
+      "attack_name": "D1_v_3_5",
+      "v_lo_mps": 3.0,
+      "v_hi_mps": 5.0,
+      "expected_doppler_lo_hz": 190.0,
+      "expected_doppler_hi_hz": 316.6666666666667,
+      "n_samples": 150,
+      "accuracy_as_drone": 0.21333333333333335,
+      "class_distribution": {
+        "Enemy Drone": 32,
+        "Bird": 117,
+        "Friendly UAV": 0,
+        "Manned Aircraft": 1
+      }
+    }
+  ]
+}

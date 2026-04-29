@@ -1,0 +1,263 @@
+{
+  "baseline_clean_accuracy": 0.8888888888888888,
+  "baseline_per_class": {
+    "Enemy Drone": {
+      "recall": 0.9777777777777777,
+      "confusion": {
+        "Enemy Drone": 44,
+        "Bird": 0,
+        "Friendly UAV": 1,
+        "Manned Aircraft": 0
+      }
+    },
+    "Bird": {
+      "recall": 0.5945945945945946,
+      "confusion": {
+        "Enemy Drone": 15,
+        "Bird": 22,
+        "Friendly UAV": 0,
+        "Manned Aircraft": 0
+      }
+    },
+    "Friendly UAV": {
+      "recall": 1.0,
+      "confusion": {
+        "Enemy Drone": 0,
+        "Bird": 0,
+        "Friendly UAV": 35,
+        "Manned Aircraft": 0
+      }
+    },
+    "Manned Aircraft": {
+      "recall": 1.0,
+      "confusion": {
+        "Enemy Drone": 0,
+        "Bird": 0,
+        "Friendly UAV": 0,
+        "Manned Aircraft": 27
+      }
+    }
+  },
+  "tests": [
+    {
+      "test": "Class-conditional bulk-Doppler mask (\u00b11 bins around peak)",
+      "half_width_bins": 1,
+      "mean_acc": 0.6805555555555556,
+      "accuracy_drop_pp": 20.833333333333325,
+      "per_class": {
+        "Enemy Drone": {
+          "recall": 0.8222222222222222,
+          "confusion": {
+            "Enemy Drone": 37,
+            "Bird": 0,
+            "Friendly UAV": 8,
+            "Manned Aircraft": 0
+          }
+        },
+        "Bird": {
+          "recall": 0.0,
+          "confusion": {
+            "Enemy Drone": 37,
+            "Bird": 0,
+            "Friendly UAV": 0,
+            "Manned Aircraft": 0
+          }
+        },
+        "Friendly UAV": {
+          "recall": 1.0,
+          "confusion": {
+            "Enemy Drone": 0,
+            "Bird": 0,
+            "Friendly UAV": 35,
+            "Manned Aircraft": 0
+          }
+        },
+        "Manned Aircraft": {
+          "recall": 0.9629629629629629,
+          "confusion": {
+            "Enemy Drone": 0,
+            "Bird": 0,
+            "Friendly UAV": 1,
+            "Manned Aircraft": 26
+          }
+        }
+      }
+    },
+    {
+      "test": "Class-conditional bulk-Doppler mask (\u00b12 bins around peak)",
+      "half_width_bins": 2,
+      "mean_acc": 0.7291666666666666,
+      "accuracy_drop_pp": 15.972222222222221,
+      "per_class": {
+        "Enemy Drone": {
+          "recall": 0.8888888888888888,
+          "confusion": {
+            "Enemy Drone": 40,
+            "Bird": 0,
+            "Friendly UAV": 5,
+            "Manned Aircraft": 0
+          }
+        },
+        "Bird": {
+          "recall": 0.10810810810810811,
+          "confusion": {
+            "Enemy Drone": 33,
+            "Bird": 4,
+            "Friendly UAV": 0,
+            "Manned Aircraft": 0
+          }
+        },
+        "Friendly UAV": {
+          "recall": 1.0,
+          "confusion": {
+            "Enemy Drone": 0,
+            "Bird": 0,
+            "Friendly UAV": 35,
+            "Manned Aircraft": 0
+          }
+        },
+        "Manned Aircraft": {
+          "recall": 0.9629629629629629,
+          "confusion": {
+            "Enemy Drone": 0,
+            "Bird": 0,
+            "Friendly UAV": 1,
+            "Manned Aircraft": 26
+          }
+        }
+      }
+    },
+    {
+      "test": "Class-conditional bulk-Doppler mask (\u00b14 bins around peak)",
+      "half_width_bins": 4,
+      "mean_acc": 0.4930555555555556,
+      "accuracy_drop_pp": 39.58333333333333,
+      "per_class": {
+        "Enemy Drone": {
+          "recall": 0.9333333333333333,
+          "confusion": {
+            "Enemy Drone": 42,
+            "Bird": 3,
+            "Friendly UAV": 0,
+            "Manned Aircraft": 0
+          }
+        },
+        "Bird": {
+          "recall": 0.10810810810810811,
+          "confusion": {
+            "Enemy Drone": 33,
+            "Bird": 4,
+            "Friendly UAV": 0,
+            "Manned Aircraft": 0
+          }
+        },
+        "Friendly UAV": {
+          "recall": 0.0,
+          "confusion": {
+            "Enemy Drone": 31,
+            "Bird": 4,
+            "Friendly UAV": 0,
+            "Manned Aircraft": 0
+          }
+        },
+        "Manned Aircraft": {
+          "recall": 0.9259259259259259,
+          "confusion": {
+            "Enemy Drone": 0,
+            "Bird": 0,
+            "Friendly UAV": 2,
+            "Manned Aircraft": 25
+          }
+        }
+      }
+    },
+    {
+      "test": "Class-conditional bulk-Doppler mask (\u00b18 bins around peak)",
+      "half_width_bins": 8,
+      "mean_acc": 0.4791666666666667,
+      "accuracy_drop_pp": 40.972222222222214,
+      "per_class": {
+        "Enemy Drone": {
+          "recall": 0.8888888888888888,
+          "confusion": {
+            "Enemy Drone": 40,
+            "Bird": 5,
+            "Friendly UAV": 0,
+            "Manned Aircraft": 0
+          }
+        },
+        "Bird": {
+          "recall": 0.08108108108108109,
+          "confusion": {
+            "Enemy Drone": 34,
+            "Bird": 3,
+            "Friendly UAV": 0,
+            "Manned Aircraft": 0
+          }
+        },
+        "Friendly UAV": {
+          "recall": 0.0,
+          "confusion": {
+            "Enemy Drone": 27,
+            "Bird": 8,
+            "Friendly UAV": 0,
+            "Manned Aircraft": 0
+          }
+        },
+        "Manned Aircraft": {
+          "recall": 0.9629629629629629,
+          "confusion": {
+            "Enemy Drone": 0,
+            "Bird": 0,
+            "Friendly UAV": 1,
+            "Manned Aircraft": 26
+          }
+        }
+      }
+    },
+    {
+      "test": "Class-conditional bulk-Doppler mask (\u00b116 bins around peak)",
+      "half_width_bins": 16,
+      "mean_acc": 0.4236111111111111,
+      "accuracy_drop_pp": 46.52777777777777,
+      "per_class": {
+        "Enemy Drone": {
+          "recall": 0.7333333333333333,
+          "confusion": {
+            "Enemy Drone": 33,
+            "Bird": 11,
+            "Friendly UAV": 1,
+            "Manned Aircraft": 0
+          }
+        },
+        "Bird": {
+          "recall": 0.08108108108108109,
+          "confusion": {
+            "Enemy Drone": 34,
+            "Bird": 3,
+            "Friendly UAV": 0,
+            "Manned Aircraft": 0
+          }
+        },
+        "Friendly UAV": {
+          "recall": 0.0,
+          "confusion": {
+            "Enemy Drone": 26,
+            "Bird": 9,
+            "Friendly UAV": 0,
+            "Manned Aircraft": 0
+          }
+        },
+        "Manned Aircraft": {
+          "recall": 0.9259259259259259,
+          "confusion": {
+            "Enemy Drone": 0,
+            "Bird": 0,
+            "Friendly UAV": 2,
+            "Manned Aircraft": 25
+          }
+        }
+      }
+    }
+  ]
+}

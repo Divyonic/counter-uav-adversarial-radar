@@ -125,17 +125,17 @@ The methodology correction is small: run permutation importance and region maski
 
 ### Where I landed
 
-A short methodology preprint, one worked example, three null results, one attribution run, one workflow proposal. The argument holds up within its scope: for the specific classifier and dataset studied, the adversarial evaluation produced uninterpretable null results, and feature attribution explained why. The scope is honest: synthetic data, one architecture, no real-radar validation yet, no demonstrated successful attack.
+A methodology preprint, one worked example, four null results across the BFP / micro-Doppler axis, two attribution runs (fixed-band + class-conditional), one demonstrated successful attack, one workflow proposal. The argument holds up within its scope: for the specific classifier and dataset studied, adversarial evaluations against the architecture's advertised physics produce uninterpretable null results; attribution explains why; and the attack the attribution predicts succeeds.
 
 The concrete artefacts are:
 
 - A reproducible pipeline from FMCW signal synthesis to trained classifier ([`baseline/`](baseline/))
-- Two adversarial attack implementations and their null results ([`adversarial/attack_a2_fewer_blades.py`](adversarial/attack_a2_fewer_blades.py), [`adversarial/attack_d2_pulse_glide.py`](adversarial/attack_d2_pulse_glide.py))
-- A feature-attribution harness running six perturbation tests ([`adversarial/feature_attribution.py`](adversarial/feature_attribution.py))
+- Five adversarial attack implementations covering the A-, B-, D-, and E-series of the threat taxonomy ([`adversarial/attack_a1_rpm_reduction.py`](adversarial/attack_a1_rpm_reduction.py), [`attack_a2_fewer_blades.py`](adversarial/attack_a2_fewer_blades.py), [`attack_b1_ram_wrap.py`](adversarial/attack_b1_ram_wrap.py), [`attack_d1_bird_speed.py`](adversarial/attack_d1_bird_speed.py), [`attack_d2_pulse_glide.py`](adversarial/attack_d2_pulse_glide.py), [`attack_e1_ornithopter.py`](adversarial/attack_e1_ornithopter.py))
+- A feature-attribution harness with both fixed-band ([`feature_attribution.py`](adversarial/feature_attribution.py)) and class-conditional ([`feature_attribution_class_conditional.py`](adversarial/feature_attribution_class_conditional.py)) tests
 - A methodology proposal in the preprint ([`paper/preprint.md`](paper/preprint.md), [`paper/preprint.pdf`](paper/preprint.pdf))
-- Findings write-ups for each experiment ([`adversarial/FINDINGS_A2.md`](adversarial/FINDINGS_A2.md), [`FINDINGS_D2.md`](adversarial/FINDINGS_D2.md), [`FINDINGS_attribution.md`](adversarial/FINDINGS_attribution.md))
+- Findings write-ups for every experiment ([`FINDINGS_A1.md`](adversarial/FINDINGS_A1.md), [`FINDINGS_A2.md`](adversarial/FINDINGS_A2.md), [`FINDINGS_B1.md`](adversarial/FINDINGS_B1.md), [`FINDINGS_D1.md`](adversarial/FINDINGS_D1.md), [`FINDINGS_D2.md`](adversarial/FINDINGS_D2.md), [`FINDINGS_E1.md`](adversarial/FINDINGS_E1.md), [`FINDINGS_attribution.md`](adversarial/FINDINGS_attribution.md), [`FINDINGS_class_conditional.md`](adversarial/FINDINGS_class_conditional.md))
 
-The natural next steps, none of which are in this repository, are: (1) real-radar replication on the Karlsson 77 GHz dataset (which Liaquat et al. 2026 already use for feature attribution with classical ML, so a direct deep-learning comparison is available), (2) an attribution-informed successful attack (B1 radar-absorbent wrap or D1 bird-speed flight, both predicted to succeed because they target what the classifier actually uses), and (3) extending the attribution-first framing to adjacent "physics-informed ML" domains where the same failure mode plausibly exists.
+The natural next steps, none of which are in this repository, are: (1) real-radar replication on the Karlsson 77 GHz dataset (which Liaquat et al. 2026 already use for feature attribution with classical ML, so a direct deep-learning comparison is available), and (2) extending the attribution-first framing to adjacent "physics-informed ML" domains where the same failure mode plausibly exists.
 
 ---
 
@@ -163,7 +163,15 @@ Removing propeller content from the signal itself (not just from the extracted f
 
 Permutation-importance and region-masking tests resolve both nulls. The classifier identifies drones by the position and amplitude of the bulk-Doppler peak, not by harmonic structure. The LSTM is a multi-instance aggregator, not a temporal tracker. BFP is used, but as a class-correlated noise distribution.
 
-### 4. Workflow proposal
+A class-conditional refinement (`feature_attribution_class_conditional.py`) sharpens this: zeroing **just ±1 frequency bin (2.3% of the axis) at each sample's own bulk-Doppler peak** drops accuracy by 20.8 pp — more than the original 25%-band fixed mask. Bird recall drops to zero at this notch width.
+
+### 4. Attribution-driven attacks &mdash; one strong success, one informative null
+
+D1 (bird-speed flight) and B1 (RAM-wrap / RCS reduction) target features attribution identified as load-bearing. **D1 succeeds strongly**: drone-classification accuracy collapses from 88.9% to 0–45% across velocity windows from 3–20 m/s. At 15–20 m/s, drones get classified as friendly UAV (149/150). At 3–10 m/s, drones get classified as bird. **B1 is null**, but for an instructive reason — per-sample dB clipping and [0,1] normalisation in `resize_spectrogram` discards absolute amplitude before the classifier sees the input, so amplitude-domain attacks cannot reach the classifier through the input pathway.
+
+A1 (pure RPM reduction) and E1 (ornithopter substitution: drone-scale RCS + drone-scale velocity + bird-style flap micro-Doppler) round out the threat taxonomy with two more nulls confirming that micro-Doppler structure is invisible to this classifier.
+
+### 5. Workflow proposal
 
 ![Attribution-first workflow](paper/figures_preprint/fig6_workflow.png)
 
@@ -189,6 +197,13 @@ python3 baseline/leakage_test.py             # diagnostic: is LSTM really tempor
 python3 adversarial/attack_a2_fewer_blades.py
 python3 adversarial/attack_d2_pulse_glide.py
 python3 adversarial/feature_attribution.py
+
+# Attribution-driven attacks and the class-conditional mask
+python3 adversarial/attack_a1_rpm_reduction.py
+python3 adversarial/attack_b1_ram_wrap.py
+python3 adversarial/attack_d1_bird_speed.py
+python3 adversarial/attack_e1_ornithopter.py
+python3 adversarial/feature_attribution_class_conditional.py
 ```
 
 Each script is self-contained. Random seeds are pinned. Re-running produces byte-identical results (up to CPU-specific floating-point variation).
@@ -223,13 +238,22 @@ counter-uav-adversarial-radar/
 │   ├── herm_extractor.py            Alternative HERM-based feature (null result)
 │   └── results/                     Baseline experiment JSON outputs
 ├── adversarial/
+│   ├── attack_a1_rpm_reduction.py   Attack A1: RPM-only sweep (predicted null)
 │   ├── attack_a2_fewer_blades.py    Attack A2: variable blade count x RPM
+│   ├── attack_b1_ram_wrap.py        Attack B1: bulk-amplitude reduction (RAM)
+│   ├── attack_d1_bird_speed.py      Attack D1: bird-speed flight (succeeds)
 │   ├── attack_d2_pulse_glide.py     Attack D2: variable pulse-and-glide ratio
-│   ├── feature_attribution.py       Permutation importance + region masking
-│   ├── FINDINGS_A2.md               Results write-up: A2 null result
-│   ├── FINDINGS_D2.md               Results write-up: D2 null result
-│   ├── FINDINGS_attribution.md      Results write-up: what the classifier uses
-│   ├── *_results.json               Raw experiment outputs
+│   ├── attack_e1_ornithopter.py    Attack E1: ornithopter substitution
+│   ├── feature_attribution.py                 Permutation + fixed-band masking
+│   ├── feature_attribution_class_conditional.py  Per-sample peak-bin masking
+│   ├── FINDINGS_A1.md, FINDINGS_A2.md          Predicted-null A-series
+│   ├── FINDINGS_B1.md                          B1 null + preprocessing critique
+│   ├── FINDINGS_D1.md                          D1 successful attack
+│   ├── FINDINGS_D2.md                          D2 null result
+│   ├── FINDINGS_E1.md                          E1 ornithopter
+│   ├── FINDINGS_attribution.md                 Fixed-band attribution
+│   ├── FINDINGS_class_conditional.md           Class-conditional refinement
+│   ├── results/*.json               Raw experiment outputs
 │   └── run_log_*.txt                Full stdout logs
 ├── tests/                           pytest suite, runs in ~2 seconds
 │   ├── test_fmcw_simulation.py      Simulator shapes, determinism, BFP regression
@@ -248,9 +272,14 @@ Each experiment is a single self-contained script; no arguments required. Expect
 |:-----------------------------------------|:-------:|:---------------------------------------------------|
 | `baseline/train_and_evaluate.py`         | 5-15 min | `baseline/results/experiment_results.json`         |
 | `baseline/leakage_test.py`               | 3-10 min | `baseline/results/leakage_test_results.json`       |
-| `adversarial/attack_a2_fewer_blades.py`  | 5-10 min | `adversarial/attack_a2_results.json`               |
-| `adversarial/attack_d2_pulse_glide.py`   | 10-15 min | `adversarial/attack_d2_results.json`              |
-| `adversarial/feature_attribution.py`     | 10-15 min | `adversarial/feature_attribution_results.json`    |
+| `adversarial/attack_a1_rpm_reduction.py` | 8-12 min | `adversarial/results/attack_a1_results.json`       |
+| `adversarial/attack_a2_fewer_blades.py`  | 5-10 min | `adversarial/results/attack_a2_results.json`       |
+| `adversarial/attack_b1_ram_wrap.py`      | 8-12 min | `adversarial/results/attack_b1_results.json`       |
+| `adversarial/attack_d1_bird_speed.py`    | 8-12 min | `adversarial/results/attack_d1_results.json`       |
+| `adversarial/attack_d2_pulse_glide.py`   | 10-15 min | `adversarial/results/attack_d2_results.json`      |
+| `adversarial/attack_e1_ornithopter.py`   | 8-12 min | `adversarial/results/attack_e1_results.json`       |
+| `adversarial/feature_attribution.py`     | 10-15 min | `adversarial/results/feature_attribution_results.json` |
+| `adversarial/feature_attribution_class_conditional.py` | 12-18 min | `adversarial/results/feature_attribution_class_conditional_results.json` |
 
 To regenerate the preprint PDF (requires Node.js, one-time `npx` downloads):
 

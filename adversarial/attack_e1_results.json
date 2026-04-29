@@ -1,0 +1,95 @@
+{
+  "baseline_clean_test_accuracy": 0.8888888888888888,
+  "attacks": [
+    {
+      "attack_name": "E1_ornithopter_std",
+      "flap_freq_hz": 8.0,
+      "wingspan_m": 0.4,
+      "v_bulk_range_mps": [
+        5.0,
+        20.0
+      ],
+      "rcs_body_mean": 0.01,
+      "n_samples": 150,
+      "accuracy_as_drone": 0.9066666666666666,
+      "class_distribution": {
+        "Enemy Drone": 136,
+        "Bird": 13,
+        "Friendly UAV": 1,
+        "Manned Aircraft": 0
+      }
+    },
+    {
+      "attack_name": "E1_low_flap",
+      "flap_freq_hz": 3.0,
+      "wingspan_m": 0.5,
+      "v_bulk_range_mps": [
+        5.0,
+        20.0
+      ],
+      "rcs_body_mean": 0.01,
+      "n_samples": 150,
+      "accuracy_as_drone": 0.8933333333333333,
+      "class_distribution": {
+        "Enemy Drone": 134,
+        "Bird": 14,
+        "Friendly UAV": 2,
+        "Manned Aircraft": 0
+      }
+    },
+    {
+      "attack_name": "E1_high_flap",
+      "flap_freq_hz": 15.0,
+      "wingspan_m": 0.3,
+      "v_bulk_range_mps": [
+        5.0,
+        20.0
+      ],
+      "rcs_body_mean": 0.01,
+      "n_samples": 150,
+      "accuracy_as_drone": 0.8333333333333334,
+      "class_distribution": {
+        "Enemy Drone": 125,
+        "Bird": 12,
+        "Friendly UAV": 13,
+        "Manned Aircraft": 0
+      }
+    },
+    {
+      "attack_name": "E1_birdRCS_droneV",
+      "flap_freq_hz": 8.0,
+      "wingspan_m": 0.4,
+      "v_bulk_range_mps": [
+        5.0,
+        20.0
+      ],
+      "rcs_body_mean": 0.005,
+      "n_samples": 150,
+      "accuracy_as_drone": 0.88,
+      "class_distribution": {
+        "Enemy Drone": 132,
+        "Bird": 13,
+        "Friendly UAV": 4,
+        "Manned Aircraft": 1
+      }
+    },
+    {
+      "attack_name": "E1_droneRCS_birdV",
+      "flap_freq_hz": 8.0,
+      "wingspan_m": 0.4,
+      "v_bulk_range_mps": [
+        5.0,
+        15.0
+      ],
+      "rcs_body_mean": 0.01,
+      "n_samples": 150,
+      "accuracy_as_drone": 0.32,
+      "class_distribution": {
+        "Enemy Drone": 48,
+        "Bird": 101,
+        "Friendly UAV": 0,
+        "Manned Aircraft": 1
+      }
+    }
+  ]
+}

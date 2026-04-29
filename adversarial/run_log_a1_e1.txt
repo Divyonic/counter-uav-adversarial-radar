@@ -1,0 +1,131 @@
+=========== A1 ===========
+Thu Apr 30 00:59:46 IST 2026
+(seed=42, n_attack_samples=150)
+======================================================================
+STEP 1: Generating clean 4-class dataset @ SNR=15dB
+======================================================================
+Generating dataset: 300 samples/class, SNR=15 dB
+  Generating Enemy Drone... done
+  Generating Bird... done
+  Generating Friendly UAV... done
+  Generating Manned Aircraft... done
+Training CNN+LSTM+BFP baseline...
+    Epoch 10: loss=0.1472, val_acc=1.0000
+    Early stopping at epoch 18
+Clean-test accuracy: 0.8889
+
+======================================================================
+STEP 2: Running A1 attack variants (pure RPM reduction)
+======================================================================
+
+  Running A1 rpm=6000 (expected BFP 200.0 Hz)...
+    Expected BFP: 200.0 Hz | Measured: 43.4 ± 59.6
+    Accuracy (correct as drone): 0.773
+    Class distribution: {'Enemy Drone': 116, 'Bird': 30, 'Friendly UAV': 4, 'Manned Aircraft': 0}
+
+  Running A1 rpm=5000 (expected BFP 166.7 Hz)...
+    Expected BFP: 166.7 Hz | Measured: 35.9 ± 49.1
+    Accuracy (correct as drone): 0.933
+    Class distribution: {'Enemy Drone': 140, 'Bird': 1, 'Friendly UAV': 6, 'Manned Aircraft': 3}
+
+  Running A1 rpm=4000 (expected BFP 133.3 Hz)...
+    Expected BFP: 133.3 Hz | Measured: 33.2 ± 54.4
+    Accuracy (correct as drone): 0.773
+    Class distribution: {'Enemy Drone': 116, 'Bird': 19, 'Friendly UAV': 11, 'Manned Aircraft': 4}
+
+  Running A1 rpm=3000 (expected BFP 100.0 Hz)...
+    Expected BFP: 100.0 Hz | Measured: 43.1 ± 61.0
+    Accuracy (correct as drone): 0.860
+    Class distribution: {'Enemy Drone': 129, 'Bird': 19, 'Friendly UAV': 2, 'Manned Aircraft': 0}
+
+  Running A1 rpm=2000 (expected BFP 66.7 Hz)...
+    Expected BFP: 66.7 Hz | Measured: 39.9 ± 53.9
+    Accuracy (correct as drone): 0.760
+    Class distribution: {'Enemy Drone': 114, 'Bird': 21, 'Friendly UAV': 13, 'Manned Aircraft': 2}
+
+  Running A1 rpm=1500 (expected BFP 50.0 Hz)...
+    Expected BFP: 50.0 Hz | Measured: 43.6 ± 59.1
+    Accuracy (correct as drone): 0.800
+    Class distribution: {'Enemy Drone': 120, 'Bird': 22, 'Friendly UAV': 8, 'Manned Aircraft': 0}
+
+  Running A1 rpm=1000 (expected BFP 33.3 Hz)...
+    Expected BFP: 33.3 Hz | Measured: 34.4 ± 56.2
+    Accuracy (correct as drone): 0.833
+    Class distribution: {'Enemy Drone': 125, 'Bird': 19, 'Friendly UAV': 6, 'Manned Aircraft': 0}
+
+  Running A1 rpm=500 (expected BFP 16.7 Hz)...
+    Expected BFP: 16.7 Hz | Measured: 34.8 ± 52.2
+    Accuracy (correct as drone): 0.840
+    Class distribution: {'Enemy Drone': 126, 'Bird': 20, 'Friendly UAV': 4, 'Manned Aircraft': 0}
+
+Results saved to /Users/drexonindustries/counter-uav-adversarial-radar/adversarial/results/attack_a1_results.json
+
+======================================================================
+SUMMARY
+======================================================================
+RPM      Exp BFP    Meas BFP       Accuracy     Dominant class           
+-------------------------------------------------------------------------
+6000     200.0      43.4           0.773        Enemy Drone (116)
+5000     166.7      35.9           0.933        Enemy Drone (140)
+4000     133.3      33.2           0.773        Enemy Drone (116)
+3000     100.0      43.1           0.860        Enemy Drone (129)
+2000     66.7       39.9           0.760        Enemy Drone (114)
+1500     50.0       43.6           0.800        Enemy Drone (120)
+1000     33.3       34.4           0.833        Enemy Drone (125)
+500      16.7       34.8           0.840        Enemy Drone (126)
+
+=========== E1 ===========
+Thu Apr 30 01:20:56 IST 2026
+(seed=42, n_attack_samples=150)
+======================================================================
+STEP 1: Generating clean 4-class dataset @ SNR=15dB
+======================================================================
+Generating dataset: 300 samples/class, SNR=15 dB
+  Generating Enemy Drone... done
+  Generating Bird... done
+  Generating Friendly UAV... done
+  Generating Manned Aircraft... done
+Training CNN+LSTM+BFP baseline...
+    Epoch 10: loss=0.1472, val_acc=1.0000
+    Early stopping at epoch 18
+Clean-test accuracy: 0.8889
+
+======================================================================
+STEP 2: Running E1 ornithopter variants
+======================================================================
+
+  Running E1_ornithopter_std: flap=8.0Hz, ws=0.4m, v=5-20m/s, rcs_body=0.01
+    Accuracy (correct as drone): 0.907
+    Class distribution: {'Enemy Drone': 136, 'Bird': 13, 'Friendly UAV': 1, 'Manned Aircraft': 0}
+
+  Running E1_low_flap: flap=3.0Hz, ws=0.5m, v=5-20m/s, rcs_body=0.01
+    Accuracy (correct as drone): 0.893
+    Class distribution: {'Enemy Drone': 134, 'Bird': 14, 'Friendly UAV': 2, 'Manned Aircraft': 0}
+
+  Running E1_high_flap: flap=15.0Hz, ws=0.3m, v=5-20m/s, rcs_body=0.01
+    Accuracy (correct as drone): 0.833
+    Class distribution: {'Enemy Drone': 125, 'Bird': 12, 'Friendly UAV': 13, 'Manned Aircraft': 0}
+
+  Running E1_birdRCS_droneV: flap=8.0Hz, ws=0.4m, v=5-20m/s, rcs_body=0.005
+    Accuracy (correct as drone): 0.880
+    Class distribution: {'Enemy Drone': 132, 'Bird': 13, 'Friendly UAV': 4, 'Manned Aircraft': 1}
+
+  Running E1_droneRCS_birdV: flap=8.0Hz, ws=0.4m, v=5-15m/s, rcs_body=0.01
+    Accuracy (correct as drone): 0.320
+    Class distribution: {'Enemy Drone': 48, 'Bird': 101, 'Friendly UAV': 0, 'Manned Aircraft': 1}
+
+Results saved to /Users/drexonindustries/counter-uav-adversarial-radar/adversarial/results/attack_e1_results.json
+
+======================================================================
+SUMMARY
+======================================================================
+Variant                      Accuracy     Dominant class           
+-----------------------------------------------------------------
+E1_ornithopter_std           0.907        Enemy Drone (136)
+E1_low_flap                  0.893        Enemy Drone (134)
+E1_high_flap                 0.833        Enemy Drone (125)
+E1_birdRCS_droneV            0.880        Enemy Drone (132)
+E1_droneRCS_birdV            0.320        Bird (101)
+
+=========== DONE ===========
+Thu Apr 30 01:36:22 IST 2026

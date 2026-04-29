@@ -1,0 +1,186 @@
+=========== B1 ===========
+Thu Apr 30 00:24:58 IST 2026
+(seed=42, n_attack_samples=150, base_snr=15dB)
+======================================================================
+STEP 1: Generating clean 4-class dataset @ SNR=15dB
+======================================================================
+Generating dataset: 300 samples/class, SNR=15 dB
+  Generating Enemy Drone... done
+  Generating Bird... done
+  Generating Friendly UAV... done
+  Generating Manned Aircraft... done
+Training CNN+LSTM+BFP baseline...
+    Epoch 10: loss=0.1472, val_acc=1.0000
+    Early stopping at epoch 18
+Clean-test accuracy: 0.8889
+
+======================================================================
+STEP 2: Running B1 attack variants (RAM wrap / amplitude attenuation)
+======================================================================
+
+  Running B1 dB_drop=0dB (effective SNR=15dB)...
+    Accuracy (correct as drone): 0.900
+    Class distribution: {'Enemy Drone': 135, 'Bird': 2, 'Friendly UAV': 12, 'Manned Aircraft': 1}
+
+  Running B1 dB_drop=3dB (effective SNR=12dB)...
+    Accuracy (correct as drone): 0.913
+    Class distribution: {'Enemy Drone': 137, 'Bird': 11, 'Friendly UAV': 2, 'Manned Aircraft': 0}
+
+  Running B1 dB_drop=6dB (effective SNR=9dB)...
+    Accuracy (correct as drone): 0.827
+    Class distribution: {'Enemy Drone': 124, 'Bird': 16, 'Friendly UAV': 8, 'Manned Aircraft': 2}
+
+  Running B1 dB_drop=10dB (effective SNR=5dB)...
+    Accuracy (correct as drone): 0.973
+    Class distribution: {'Enemy Drone': 146, 'Bird': 3, 'Friendly UAV': 1, 'Manned Aircraft': 0}
+
+  Running B1 dB_drop=15dB (effective SNR=0dB)...
+    Accuracy (correct as drone): 0.947
+    Class distribution: {'Enemy Drone': 142, 'Bird': 3, 'Friendly UAV': 1, 'Manned Aircraft': 4}
+
+  Running B1 dB_drop=20dB (effective SNR=-5dB)...
+    Accuracy (correct as drone): 0.773
+    Class distribution: {'Enemy Drone': 116, 'Bird': 7, 'Friendly UAV': 25, 'Manned Aircraft': 2}
+
+Results saved to /Users/drexonindustries/counter-uav-adversarial-radar/adversarial/results/attack_b1_results.json
+
+======================================================================
+SUMMARY
+======================================================================
+RCS drop     Eff SNR      Accuracy     Dominant class           
+----------------------------------------------------------------
+0            15           0.900        Enemy Drone (135)
+3            12           0.913        Enemy Drone (137)
+6            9            0.827        Enemy Drone (124)
+10           5            0.973        Enemy Drone (146)
+15           0            0.947        Enemy Drone (142)
+20           -5           0.773        Enemy Drone (116)
+
+=========== D1 ===========
+Thu Apr 30 00:40:50 IST 2026
+(seed=42, n_attack_samples=150)
+======================================================================
+STEP 1: Generating clean 4-class dataset @ SNR=15dB
+======================================================================
+Generating dataset: 300 samples/class, SNR=15 dB
+  Generating Enemy Drone... done
+  Generating Bird... done
+  Generating Friendly UAV... done
+  Generating Manned Aircraft... done
+Training CNN+LSTM+BFP baseline...
+    Epoch 10: loss=0.1472, val_acc=1.0000
+    Early stopping at epoch 18
+Clean-test accuracy: 0.8889
+
+======================================================================
+STEP 2: Running D1 attack variants (bird-speed flight)
+======================================================================
+
+  Running D1 v_bulk=15.0-20.0 m/s (Doppler 950-1267 Hz)...
+    Accuracy (correct as drone): 0.000
+    Class distribution: {'Enemy Drone': 0, 'Bird': 0, 'Friendly UAV': 149, 'Manned Aircraft': 1}
+
+  Running D1 v_bulk=10.0-15.0 m/s (Doppler 633-950 Hz)...
+    Accuracy (correct as drone): 0.207
+    Class distribution: {'Enemy Drone': 31, 'Bird': 119, 'Friendly UAV': 0, 'Manned Aircraft': 0}
+
+  Running D1 v_bulk=8.0-12.0 m/s (Doppler 507-760 Hz)...
+    Accuracy (correct as drone): 0.267
+    Class distribution: {'Enemy Drone': 40, 'Bird': 110, 'Friendly UAV': 0, 'Manned Aircraft': 0}
+
+  Running D1 v_bulk=5.0-10.0 m/s (Doppler 317-633 Hz)...
+    Accuracy (correct as drone): 0.453
+    Class distribution: {'Enemy Drone': 68, 'Bird': 82, 'Friendly UAV': 0, 'Manned Aircraft': 0}
+
+  Running D1 v_bulk=5.0-8.0 m/s (Doppler 317-507 Hz)...
+    Accuracy (correct as drone): 0.287
+    Class distribution: {'Enemy Drone': 43, 'Bird': 102, 'Friendly UAV': 0, 'Manned Aircraft': 5}
+
+  Running D1 v_bulk=3.0-5.0 m/s (Doppler 190-317 Hz)...
+    Accuracy (correct as drone): 0.213
+    Class distribution: {'Enemy Drone': 32, 'Bird': 117, 'Friendly UAV': 0, 'Manned Aircraft': 1}
+
+Results saved to /Users/drexonindustries/counter-uav-adversarial-radar/adversarial/results/attack_d1_results.json
+
+======================================================================
+SUMMARY
+======================================================================
+v_bulk (m/s)    Doppler (Hz)       Accuracy     Dominant class           
+-------------------------------------------------------------------------
+15-20          950-1267          0.000        Friendly UAV (149)
+10-15          633-950           0.207        Bird (119)
+8-12          507-760           0.267        Bird (110)
+5-10          317-633           0.453        Bird (82)
+5-8           317-507           0.287        Bird (102)
+3-5           190-317           0.213        Bird (117)
+
+=========== CLASS-COND ===========
+Thu Apr 30 00:56:50 IST 2026
+(seed=42)
+======================================================================
+Training baseline CNN+LSTM+BFP
+======================================================================
+Generating dataset: 300 samples/class, SNR=15 dB
+  Generating Enemy Drone... done
+  Generating Bird... done
+  Generating Friendly UAV... done
+  Generating Manned Aircraft... done
+    Epoch 10: loss=0.1472, val_acc=1.0000
+    Early stopping at epoch 18
+Clean baseline accuracy: 0.8889
+
+======================================================================
+Class-conditional bulk-Doppler mask, sweeping half-width
+======================================================================
+
+  Mask half-width = ±1 bins (2.3% of freq axis)...
+    Accuracy: 0.6806  (drop: +20.83 pp)
+      Enemy Drone: recall 0.822, conf {'Enemy Drone': 37, 'Bird': 0, 'Friendly UAV': 8, 'Manned Aircraft': 0}
+      Bird: recall 0.000, conf {'Enemy Drone': 37, 'Bird': 0, 'Friendly UAV': 0, 'Manned Aircraft': 0}
+      Friendly UAV: recall 1.000, conf {'Enemy Drone': 0, 'Bird': 0, 'Friendly UAV': 35, 'Manned Aircraft': 0}
+      Manned Aircraft: recall 0.963, conf {'Enemy Drone': 0, 'Bird': 0, 'Friendly UAV': 1, 'Manned Aircraft': 26}
+
+  Mask half-width = ±2 bins (3.9% of freq axis)...
+    Accuracy: 0.7292  (drop: +15.97 pp)
+      Enemy Drone: recall 0.889, conf {'Enemy Drone': 40, 'Bird': 0, 'Friendly UAV': 5, 'Manned Aircraft': 0}
+      Bird: recall 0.108, conf {'Enemy Drone': 33, 'Bird': 4, 'Friendly UAV': 0, 'Manned Aircraft': 0}
+      Friendly UAV: recall 1.000, conf {'Enemy Drone': 0, 'Bird': 0, 'Friendly UAV': 35, 'Manned Aircraft': 0}
+      Manned Aircraft: recall 0.963, conf {'Enemy Drone': 0, 'Bird': 0, 'Friendly UAV': 1, 'Manned Aircraft': 26}
+
+  Mask half-width = ±4 bins (7.0% of freq axis)...
+    Accuracy: 0.4931  (drop: +39.58 pp)
+      Enemy Drone: recall 0.933, conf {'Enemy Drone': 42, 'Bird': 3, 'Friendly UAV': 0, 'Manned Aircraft': 0}
+      Bird: recall 0.108, conf {'Enemy Drone': 33, 'Bird': 4, 'Friendly UAV': 0, 'Manned Aircraft': 0}
+      Friendly UAV: recall 0.000, conf {'Enemy Drone': 31, 'Bird': 4, 'Friendly UAV': 0, 'Manned Aircraft': 0}
+      Manned Aircraft: recall 0.926, conf {'Enemy Drone': 0, 'Bird': 0, 'Friendly UAV': 2, 'Manned Aircraft': 25}
+
+  Mask half-width = ±8 bins (13.3% of freq axis)...
+    Accuracy: 0.4792  (drop: +40.97 pp)
+      Enemy Drone: recall 0.889, conf {'Enemy Drone': 40, 'Bird': 5, 'Friendly UAV': 0, 'Manned Aircraft': 0}
+      Bird: recall 0.081, conf {'Enemy Drone': 34, 'Bird': 3, 'Friendly UAV': 0, 'Manned Aircraft': 0}
+      Friendly UAV: recall 0.000, conf {'Enemy Drone': 27, 'Bird': 8, 'Friendly UAV': 0, 'Manned Aircraft': 0}
+      Manned Aircraft: recall 0.963, conf {'Enemy Drone': 0, 'Bird': 0, 'Friendly UAV': 1, 'Manned Aircraft': 26}
+
+  Mask half-width = ±16 bins (25.8% of freq axis)...
+    Accuracy: 0.4236  (drop: +46.53 pp)
+      Enemy Drone: recall 0.733, conf {'Enemy Drone': 33, 'Bird': 11, 'Friendly UAV': 1, 'Manned Aircraft': 0}
+      Bird: recall 0.081, conf {'Enemy Drone': 34, 'Bird': 3, 'Friendly UAV': 0, 'Manned Aircraft': 0}
+      Friendly UAV: recall 0.000, conf {'Enemy Drone': 26, 'Bird': 9, 'Friendly UAV': 0, 'Manned Aircraft': 0}
+      Manned Aircraft: recall 0.926, conf {'Enemy Drone': 0, 'Bird': 0, 'Friendly UAV': 2, 'Manned Aircraft': 25}
+
+Results saved to /Users/drexonindustries/counter-uav-adversarial-radar/adversarial/results/feature_attribution_class_conditional_results.json
+
+======================================================================
+SUMMARY (larger drop = more bulk-Doppler-peak dependence)
+======================================================================
+Baseline clean accuracy: 0.8889
+Mask ±bins      %freq axis     Masked Acc   Drop (pp)   
+-----------------------------------------------------------------
+1               2.3            0.6806       +20.83
+2               3.9            0.7292       +15.97
+4               7.0            0.4931       +39.58
+8               13.3           0.4792       +40.97
+16              25.8           0.4236       +46.53
+
+=========== DONE ===========
+Thu Apr 30 01:17:24 IST 2026

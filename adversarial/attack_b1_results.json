@@ -1,0 +1,84 @@
+{
+  "baseline_clean_test_accuracy": 0.8888888888888888,
+  "base_snr_db": 15,
+  "attacks": [
+    {
+      "attack_name": "B1_drop_0dB",
+      "rcs_drop_db": 0.0,
+      "effective_snr_db": 15.0,
+      "n_samples": 150,
+      "accuracy_as_drone": 0.9,
+      "class_distribution": {
+        "Enemy Drone": 135,
+        "Bird": 2,
+        "Friendly UAV": 12,
+        "Manned Aircraft": 1
+      }
+    },
+    {
+      "attack_name": "B1_drop_3dB",
+      "rcs_drop_db": 3.0,
+      "effective_snr_db": 12.0,
+      "n_samples": 150,
+      "accuracy_as_drone": 0.9133333333333333,
+      "class_distribution": {
+        "Enemy Drone": 137,
+        "Bird": 11,
+        "Friendly UAV": 2,
+        "Manned Aircraft": 0
+      }
+    },
+    {
+      "attack_name": "B1_drop_6dB",
+      "rcs_drop_db": 6.0,
+      "effective_snr_db": 9.0,
+      "n_samples": 150,
+      "accuracy_as_drone": 0.8266666666666667,
+      "class_distribution": {
+        "Enemy Drone": 124,
+        "Bird": 16,
+        "Friendly UAV": 8,
+        "Manned Aircraft": 2
+      }
+    },
+    {
+      "attack_name": "B1_drop_10dB",
+      "rcs_drop_db": 10.0,
+      "effective_snr_db": 5.0,
+      "n_samples": 150,
+      "accuracy_as_drone": 0.9733333333333334,
+      "class_distribution": {
+        "Enemy Drone": 146,
+        "Bird": 3,
+        "Friendly UAV": 1,
+        "Manned Aircraft": 0
+      }
+    },
+    {
+      "attack_name": "B1_drop_15dB",
+      "rcs_drop_db": 15.0,
+      "effective_snr_db": 0.0,
+      "n_samples": 150,
+      "accuracy_as_drone": 0.9466666666666667,
+      "class_distribution": {
+        "Enemy Drone": 142,
+        "Bird": 3,
+        "Friendly UAV": 1,
+        "Manned Aircraft": 4
+      }
+    },
+    {
+      "attack_name": "B1_drop_20dB",
+      "rcs_drop_db": 20.0,
+      "effective_snr_db": -5.0,
+      "n_samples": 150,
+      "accuracy_as_drone": 0.7733333333333333,
+      "class_distribution": {
+        "Enemy Drone": 116,
+        "Bird": 7,
+        "Friendly UAV": 25,
+        "Manned Aircraft": 2
+      }
+    }
+  ]
+}

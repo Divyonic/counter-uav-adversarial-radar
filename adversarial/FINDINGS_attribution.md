@@ -71,12 +71,14 @@ The "physics-informed CNN+LSTM+BFP" architecture, when trained on this synthetic
 
 ## Next experiments
 
-1. **Class-conditional masking**: for each sample, mask the ±N bins around its own bulk-Doppler peak. This disentangles bulk from micro-Doppler properly.
-2. **Attack B1 (amplitude reduction / RAM wrap)**: directly tests whether bulk RCS amplitude is load-bearing.
-3. **Real-data replication**: repeat the A2 / D2 / attribution protocol on DroneRF, to determine whether the critique is specific to this synthetic setup or generalizes.
+1. **Class-conditional masking** ([`FINDINGS_class_conditional.md`](FINDINGS_class_conditional.md)): for each sample, mask the ±N bins around its own bulk-Doppler peak. **Done.** A ±1-bin mask (2.3% of the freq axis) drops accuracy by 20.8 pp — more than the original fixed central 25% mask did. Confirms peak-position dependence.
+2. **Attack B1 (amplitude reduction / RAM wrap)** ([`FINDINGS_B1.md`](FINDINGS_B1.md)): tests whether bulk RCS amplitude is load-bearing. **Done.** Null result: per-sample dB clipping + [0,1] normalisation in `resize_spectrogram` discards absolute amplitude before the classifier sees the input. Refines the attribution claim — "amplitude" here means post-normalised relative shape, not absolute received power.
+3. **Attack D1 (bird-speed flight)** ([`FINDINGS_D1.md`](FINDINGS_D1.md)): tests whether bulk-Doppler peak *position* is load-bearing. **Done.** Strong success: drone-classification accuracy collapses to 0–45% across the velocity sweep.
+4. **Attack A1 (pure RPM reduction)** ([`FINDINGS_A1.md`](FINDINGS_A1.md)) and **Attack E1 (ornithopter substitution)** ([`FINDINGS_E1.md`](FINDINGS_E1.md)): A-series completion + existence-proof check. **Both null** at drone-typical bulk velocity, confirming neither BFP physics nor flap-vs-prop micro-Doppler structure is read.
+5. **Real-data replication**: repeat the protocol on DroneRF or the Karlsson 77 GHz dataset, to determine whether the critique generalises beyond this synthetic setup. *Not yet done.*
 
 ## Files
 
 - `feature_attribution.py`, implementation
-- `results/feature_attribution_results.json`, raw numbers
+- `feature_attribution_results.json`, raw numbers
 - `run_log_feat_attr.txt`, full stdout (copy of `/tmp/feat_attr.log`)
