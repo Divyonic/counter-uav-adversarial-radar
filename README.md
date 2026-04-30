@@ -19,7 +19,7 @@
 
 ## TL;DR
 
-We train a representative counter-UAV radar classifier (CNN + LSTM + physics-informed BFP feature), run two physically motivated adversarial attacks, and measure null results. Feature-attribution experiments then reveal that the classifier never uses the features the attacks target. The null results therefore say nothing about robustness. We propose an **attribution-first workflow** as a minimum prerequisite for credible adversarial evaluation of radar ML classifiers.
+We train a representative counter-UAV radar classifier (CNN + LSTM + physics-informed BFP feature) and run a full threat taxonomy of seven adversarial experiments against it. Four physically motivated attacks against the architecture's advertised physics (A1, A2, D2, E1) produce **null results**. Feature-attribution experiments — both fixed-band masking and a class-conditional mask around each sample's own bulk-Doppler peak — reveal that the classifier never reads the features those attacks target; it reads bulk-Doppler peak position. The two attribution-driven attacks then split: **D1 (bird-speed flight) succeeds strongly, collapsing drone classification from 89% to 0–45%; B1 (RAM-wrap / amplitude reduction) is null because per-sample spectrogram normalisation discards absolute amplitude before the classifier sees the input**. We propose an **attribution-first workflow** as a minimum prerequisite for credible adversarial evaluation of radar ML classifiers, and demonstrate end-to-end how it would have reframed every result above.
 
 ![Feature attribution headline result](paper/figures_preprint/fig5_attr.png)
 
@@ -141,7 +141,20 @@ The natural next steps, none of which are in this repository, are: (1) real-rada
 
 ## Findings at a glance
 
-Three experiments, run in sequence. Each builds on the previous.
+Seven experiments organised by what they target in the pipeline. Predicted-null and predicted-success outcomes are derived from the attribution analysis in §3.
+
+| # | Experiment | What it targets | Outcome | Drone-classification accuracy |
+|:-:|:-----------|:----------------|:--------|:------------------------------|
+| 1 | **A2** &mdash; blade-count + RPM reduction | BFP / blade-flash physics | Null | 83–89% (clean: 88.9%) |
+| 2 | **A1** &mdash; pure RPM sweep, 500–6000 RPM | BFP / blade-flash physics | Null | 76–93% |
+| 3 | **D2** &mdash; pulse-and-glide flight | Propeller harmonic content | Null | 81–89% |
+| 4 | **E1** &mdash; ornithopter substitution | Micro-Doppler structure | Null at drone-typical v_bulk (4 of 5 variants) | 83–91% |
+| 5 | **Feature attribution** &mdash; permutation + fixed-band masking | Identifies the load-bearing feature | Bulk-Doppler peak (position + post-norm shape) | — |
+| 6 | **Class-conditional mask** &mdash; ±N bins around each sample's own peak | Refinement of #5 | Strong: ±1 bin (2.3% of axis) drops accuracy 20.8 pp | 68% (clean: 88.9%) |
+| 7 | **D1** &mdash; bird-speed flight | Bulk-Doppler peak position | **Strong success.** 0% drone at 15–20 m/s (UAV confusion); 21–45% at 3–10 m/s (bird confusion) | 0–45% |
+| 8 | **B1** &mdash; RAM-wrap / amplitude attenuation 0–20 dB | Bulk-Doppler peak amplitude | Null. Preprocessing absorbs amplitude before the classifier | 77–97% |
+
+Three experiments, told in narrative order. Each builds on the previous.
 
 ### 1. Attack A2 &mdash; blade-count reduction &mdash; *null*
 
@@ -295,8 +308,9 @@ mv preprint_pdf.pdf ../preprint.pdf
 
 1. **Synthetic data only.** The entire evaluation uses physics-based simulated FMCW returns. Extension to real radar data (Karlsson 77 GHz on Zenodo, DIAT-&mu;SAT on IEEE DataPort) is proposed in the preprint but not yet attempted.
 2. **Single classifier architecture.** The critique applies directly to the CNN + LSTM + BFP baseline; generalisation to other counter-UAV ML architectures is suggested but not proved.
-3. **Frequency-band mask tests are geometrically confounded.** Bulk-Doppler energy for different classes lives in different Doppler bands, so the "bulk" and "micro" masks cannot cleanly separate the two. A class-conditional mask around each sample's own bulk-Doppler peak would be cleaner; proposed but not run.
-4. **No demonstration of a successful attack.** Attribution predicts that attacks targeting bulk-Doppler position (reduced airspeed) or bulk-echo amplitude (radar-absorbent material) should succeed, but these are not run here.
+3. **D1's "drone &rarr; friendly UAV" failure mode is training-distribution-specific.** The 99% confusion at v_bulk = 15–20 m/s exists because the training distribution overlaps drone (5–20 m/s) with friendly UAV (15–35 m/s). A different training distribution would close that window, but it would not close the bird window — birds and slow drones overlap in any realistic distribution.
+4. **B1 attacks the wrong layer.** B1's null result is informative (per-sample dB clipping + [0,1] normalisation discards absolute amplitude), but it does not test classifier robustness against amplitude attacks combined with the upstream CFAR detection stage. A complete amplitude-attack evaluation should integrate detection-time effects, which are out of scope here.
+5. **Preprint is one revision behind the code.** [`paper/preprint.md`](paper/preprint.md) covers A2, D2, and the original fixed-band attribution but predates the B1, D1, A1, E1, and class-conditional results in this repo. The findings write-ups in [`adversarial/`](adversarial/) are the current source of truth.
 
 ---
 
