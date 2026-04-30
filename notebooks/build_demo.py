@@ -292,11 +292,144 @@ md("""Read top-to-bottom:
 
 The picture resolving A2 and D2: the classifier identifies drones by **the position and amplitude of the bulk-Doppler peak in the spectrogram**, not by blade-flash harmonics or temporal evolution. A2 changed the blade physics while leaving the bulk-Doppler peak intact. D2 removed the blades but kept the body echo at drone-typical bulk-Doppler velocity. Neither attack touched what the classifier was actually reading.""")
 
-md("""## 8. What it means
+md("""## 8. Class-conditional bulk-Doppler mask
 
-Both attacks failed. The easy reading was "classifier robust." The correct reading is "attacks targeted features the classifier does not use."
+The fixed-band mask tests above are geometrically confounded — the bulk-Doppler peak sits at different absolute frequency bins for different classes. A cleaner test masks ±N bins around *each sample's own* peak-power frequency bin.""")
 
-Without the attribution run, these two readings are indistinguishable from the accuracy numbers alone. Any adversarial evaluation in this field that reports null results without feature-attribution evidence is exposed to this same failure mode.
+code("""with open(os.path.join(REPO, "adversarial/feature_attribution_class_conditional_results.json")) as f:
+    cc = json.load(f)
+
+baseline_cc = cc["baseline_clean_accuracy"]
+print(f"Clean baseline: {baseline_cc:.4f}")
+print(f"{'Half-width':<12} {'Masked acc':<12} {'Drop (pp)':<10}")
+print("-" * 36)
+for r in cc["tests"]:
+    print(f"±{r['half_width_bins']:<11} {r['mean_acc']:<12.4f} +{r['accuracy_drop_pp']:.2f}")""")
+
+code("""hws = [r["half_width_bins"] for r in cc["tests"]]
+drops = [r["accuracy_drop_pp"] for r in cc["tests"]]
+
+fig, ax = plt.subplots(figsize=(9, 4.4))
+ax.plot(hws, drops, marker="o", markersize=12, linewidth=2.5,
+         color="#dc2626", markerfacecolor="white", markeredgewidth=2)
+ax.axhline(16.0, color="#3b82f6", linestyle=":", linewidth=2,
+            label="Fixed central 25% mask (+16.0 pp)")
+ax.axhline(33.3, color="#9333ea", linestyle=":", linewidth=2,
+            label="Fixed outer 50% mask (+33.3 pp)")
+ax.set_xticks(hws)
+ax.set_xlabel("Mask half-width (bins around each sample's own peak)")
+ax.set_ylabel("Accuracy drop (pp)")
+ax.set_title("Class-conditional mask is more efficient per masked bin")
+ax.legend(loc="lower right", frameon=False)
+for hw, d in zip(hws, drops):
+    ax.annotate(f"+{d:.1f}", (hw, d), textcoords="offset points",
+                  xytext=(0, 10), ha="center", fontweight="bold")
+plt.tight_layout()
+plt.show()""")
+
+md("""Masking just **±1 frequency bin (2.3% of the axis) at each sample's peak drops accuracy by 20.8 pp** — more than the fixed central-25% mask did with 10× more masking. This is the cleanest demonstration in the repo that the load-bearing feature is the bulk-Doppler peak position+shape.""")
+
+md("""## 9. Attack D1 — bird-speed flight (the attack that succeeds)
+
+If the classifier reads bulk-Doppler peak position, then a drone flown slowly enough that its bulk-Doppler peak overlaps the bird-class velocity distribution should be classified as a bird. A drone flown at the upper end of the drone training distribution (where it overlaps the friendly UAV class) should be classified as friendly UAV.""")
+
+code("""with open(os.path.join(REPO, "adversarial/attack_d1_results.json")) as f:
+    d1 = json.load(f)
+
+print(f"{'Velocity (m/s)':<18} {'Drone acc':<12} {'Dominant class'}")
+print("-" * 60)
+for r in d1["attacks"]:
+    cd = r["class_distribution"]
+    dominant = max(cd.items(), key=lambda kv: kv[1])
+    label = f"{r['v_lo_mps']:.0f}-{r['v_hi_mps']:.0f}"
+    print(f"{label:<18} {r['accuracy_as_drone']:<12.3f} "
+          f"{dominant[0]} ({dominant[1]}/{r['n_samples']})")""")
+
+code("""labels = [f"{r['v_lo_mps']:.0f}-{r['v_hi_mps']:.0f}" for r in d1["attacks"]]
+drone_pcts = {cls: [] for cls in
+              ["Enemy Drone", "Bird", "Friendly UAV", "Manned Aircraft"]}
+for r in d1["attacks"]:
+    n = r["n_samples"]
+    for cls in drone_pcts:
+        drone_pcts[cls].append(r["class_distribution"][cls] / n * 100)
+
+class_colours = {"Enemy Drone": "#dc2626", "Bird": "#16a34a",
+                  "Friendly UAV": "#2563eb", "Manned Aircraft": "#9333ea"}
+
+fig, ax = plt.subplots(figsize=(10, 4.6))
+bottoms = np.zeros(len(labels))
+for cls, pcts in drone_pcts.items():
+    pcts_arr = np.array(pcts)
+    ax.bar(labels, pcts_arr, bottom=bottoms, label=cls,
+            color=class_colours[cls], edgecolor="white", linewidth=0.8)
+    bottoms = bottoms + pcts_arr
+ax.set_ylim(0, 100)
+ax.set_xlabel("Drone bulk velocity v_bulk (m/s)")
+ax.set_ylabel("Class-prediction share (%)")
+ax.set_title("D1: drone classification collapses outside the 8-15 m/s window")
+ax.legend(loc="lower center", bbox_to_anchor=(0.5, -0.28), ncol=4,
+           frameon=False)
+plt.tight_layout()
+plt.show()""")
+
+md("""Two distinct failure modes appear:
+
+- **Slow drones (≤ 12 m/s) read as bird.** At v_bulk = 5–10 m/s, drone classification drops to 45%; at 3–5 m/s, 78% of the fleet reads as bird.
+- **Fast drones (15–20 m/s) read as friendly UAV.** 149/150 — essentially complete confusion. Friendly-coded targets are explicitly *not* engaged by counter-UAV systems.
+
+Both misclassifications require **no hardware modification**: only a flight-controller change. This is the attribution-predicted attack, and it works exactly as predicted.""")
+
+md("""## 10. Attack B1 — RAM-wrap (the informative null)
+
+If amplitude were also load-bearing, attenuating the drone's radar return should also defeat the classifier. We sweep 0–20 dB of attenuation. It does not.""")
+
+code("""with open(os.path.join(REPO, "adversarial/attack_b1_results.json")) as f:
+    b1 = json.load(f)
+
+print(f"{'RCS drop':<10} {'Eff SNR':<10} {'Drone acc'}")
+print("-" * 30)
+for r in b1["attacks"]:
+    print(f"{r['rcs_drop_db']:<10.0f} {r['effective_snr_db']:<10.0f} "
+          f"{r['accuracy_as_drone']:.3f}")""")
+
+code("""drops = [r["rcs_drop_db"] for r in b1["attacks"]]
+accs = [r["accuracy_as_drone"] * 100 for r in b1["attacks"]]
+baseline_b1 = b1["baseline_clean_test_accuracy"] * 100
+
+fig, ax = plt.subplots(figsize=(9, 4.4))
+ax.axhspan(baseline_b1 - 5, baseline_b1 + 5, color="#10b981", alpha=0.15,
+            label="Baseline ±5 pp")
+ax.plot(drops, accs, marker="o", markersize=12, linewidth=2.5,
+         color="#dc2626", markerfacecolor="white", markeredgewidth=2)
+ax.set_xticks(drops)
+ax.set_ylim(0, 100)
+ax.set_xlabel("Bulk-amplitude attenuation (dB)")
+ax.set_ylabel("Drone-class accuracy (%)")
+ax.set_title("B1: amplitude attacks bounce off the preprocessing layer")
+ax.legend(loc="lower left", frameon=False)
+for d, a in zip(drops, accs):
+    ax.annotate(f"{a:.0f}%", (d, a), textcoords="offset points",
+                  xytext=(0, 10), ha="center", fontweight="bold")
+plt.tight_layout()
+plt.show()""")
+
+md("""Drone classification stays in the 77–97% band across the entire 0–20 dB sweep, including effective SNR of −5 dB.
+
+The reason is the preprocessing pipeline. `compute_spectrogram` → `resize_spectrogram` does dB clipping to a 40 dB dynamic range and per-sample [0, 1] normalisation, which **discards absolute amplitude before the classifier sees the input**. So the classifier reads bulk-Doppler peak *position* and *post-normalised relative shape* — not absolute amplitude. B1 is therefore a CFAR/detection-stage attack rather than a classifier-input attack.
+
+This sharpens the attribution claim. The methodology argument now has both a successful attack (D1) and an informative null (B1), each interpretable only because the attribution work came first.""")
+
+md("""## 11. What it means
+
+The complete picture:
+
+- Six attacks from the threat taxonomy, plus two attribution runs.
+- Four attacks against the architecture's advertised physics (A1, A2, D2, E1) all null. Easy to misread as robustness.
+- Attribution shows what the classifier actually reads: bulk-Doppler peak position+shape. The class-conditional mask makes this surgical.
+- D1 (bird-speed flight, attribution-driven) **succeeds completely** — drone classification collapses to 0–45% with no hardware change.
+- B1 (RAM-wrap, attribution-driven) is null because preprocessing absorbs amplitude. This is interpretable only with the attribution context.
+
+**Without the attribution run, the four pre-attribution nulls would have read as robustness.** They are not. The attribution-driven attack against what the classifier actually uses is catastrophic.
 
 The methodology correction is small: **run permutation importance and region masking before designing the attacks, so you know what you are aiming at.** The implication is not: counter-UAV radar is safety-critical sensing, and the published robustness claims that lean on null results deserve a much closer audit.
 
@@ -304,7 +437,7 @@ For the full argument see [`../paper/preprint.pdf`](../paper/preprint.pdf) or [`
 
 ---
 
-*Divya Kumar Jitendra Patel, IIT Madras, April 2026.*
+*Divya Kumar Jitendra Patel, IIT Madras, April 2026 (revision 2).*
 """)
 
 nb.cells = cells
