@@ -14,7 +14,7 @@ import torch.nn.functional as F
 
 class CNNFeatureExtractor(nn.Module):
     """CNN for micro-Doppler spectrogram feature extraction."""
-    
+
     def __init__(self):
         super().__init__()
         self.conv1 = nn.Sequential(
@@ -37,7 +37,7 @@ class CNNFeatureExtractor(nn.Module):
         self.fc = nn.Sequential(
             nn.Linear(256, 128), nn.ReLU(), nn.Dropout(0.5)
         )
-    
+
     def forward(self, x):
         # x: (B, 1, 128, 128)
         x = self.conv1(x)   # (B, 32, 64, 64)
@@ -52,12 +52,12 @@ class CNNFeatureExtractor(nn.Module):
 
 class CNNClassifier(nn.Module):
     """CNN-only classifier (no LSTM, no BFP)."""
-    
+
     def __init__(self, n_classes=4):
         super().__init__()
         self.cnn = CNNFeatureExtractor()
         self.classifier = nn.Linear(128, n_classes)
-    
+
     def forward(self, x):
         features = self.cnn(x)
         return self.classifier(features)
@@ -65,12 +65,12 @@ class CNNClassifier(nn.Module):
 
 class CNNBPFClassifier(nn.Module):
     """CNN + BFP classifier (no LSTM)."""
-    
+
     def __init__(self, n_classes=4, bfp_dim=3):
         super().__init__()
         self.cnn = CNNFeatureExtractor()
         self.classifier = nn.Linear(128 + bfp_dim, n_classes)
-    
+
     def forward(self, x, bfp):
         features = self.cnn(x)
         combined = torch.cat([features, bfp], dim=1)
@@ -79,13 +79,13 @@ class CNNBPFClassifier(nn.Module):
 
 class LSTMTracker(nn.Module):
     """LSTM for temporal sequence classification."""
-    
+
     def __init__(self, input_dim=131, n_classes=4):
         super().__init__()
         self.lstm1 = nn.LSTM(input_dim, 64, batch_first=True)
         self.lstm2 = nn.LSTM(64, 32, batch_first=True)
         self.fc = nn.Linear(32, n_classes)
-    
+
     def forward(self, x):
         # x: (B, T, 131)
         out, _ = self.lstm1(x)    # (B, T, 64)
@@ -96,28 +96,28 @@ class LSTMTracker(nn.Module):
 
 class CNNLSTMClassifier(nn.Module):
     """Full CNN + LSTM + BFP model."""
-    
+
     def __init__(self, n_classes=4, bfp_dim=3, seq_len=10):
         super().__init__()
         self.cnn = CNNFeatureExtractor()
         self.lstm = LSTMTracker(input_dim=128 + bfp_dim, n_classes=n_classes)
         self.seq_len = seq_len
-    
+
     def forward(self, x_seq, bfp_seq):
         """
         x_seq: (B, T, 1, 128, 128) - sequence of spectrograms
         bfp_seq: (B, T, 3) - sequence of BFP features
         """
         B, T = x_seq.shape[0], x_seq.shape[1]
-        
+
         # Process ALL frames through CNN at once (batch B*T)
         x_flat = x_seq.reshape(B * T, *x_seq.shape[2:])  # (B*T, 1, 128, 128)
         cnn_flat = self.cnn(x_flat)                        # (B*T, 128)
         cnn_features = cnn_flat.reshape(B, T, -1)          # (B, T, 128)
-        
+
         # Concatenate BFP features
         combined = torch.cat([cnn_features, bfp_seq], dim=2)  # (B, T, 131)
-        
+
         # LSTM classification
         return self.lstm(combined)
 
@@ -132,22 +132,22 @@ def verify_architectures():
     print("=" * 50)
     print("MODEL PARAMETER VERIFICATION")
     print("=" * 50)
-    
+
     cnn = CNNFeatureExtractor()
-    print(f"\nCNN Feature Extractor:")
+    print("\nCNN Feature Extractor:")
     print(f"  Parameters: {count_parameters(cnn):,}")
-    print(f"  Paper claims: ~420K")
-    
+    print("  Paper claims: ~420K")
+
     lstm = LSTMTracker(input_dim=131, n_classes=4)
-    print(f"\nLSTM Tracker:")
+    print("\nLSTM Tracker:")
     print(f"  Parameters: {count_parameters(lstm):,}")
-    print(f"  Paper claims: ~62.7K")
-    
+    print("  Paper claims: ~62.7K")
+
     full_model = CNNLSTMClassifier()
-    print(f"\nFull CNN+LSTM+BFP Model:")
+    print("\nFull CNN+LSTM+BFP Model:")
     print(f"  Parameters: {count_parameters(full_model):,}")
-    print(f"  Paper claims: ~483K")
-    
+    print("  Paper claims: ~483K")
+
     # Test forward pass
     print("\nForward pass test:")
     x_seq = torch.randn(2, 10, 1, 128, 128)
@@ -156,7 +156,7 @@ def verify_architectures():
     print(f"  Input: x_seq={x_seq.shape}, bfp_seq={bfp_seq.shape}")
     print(f"  Output: {out.shape}")
     print(f"  Output probs: {F.softmax(out[0], dim=0).detach().numpy()}")
-    
+
     return cnn, lstm, full_model
 
 

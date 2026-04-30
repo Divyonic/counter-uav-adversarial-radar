@@ -1,7 +1,5 @@
 """Tests for the classifier architectures in baseline/model.py."""
 
-import numpy as np
-import pytest
 import torch
 
 from model import CNNClassifier, CNNBPFClassifier, CNNLSTMClassifier

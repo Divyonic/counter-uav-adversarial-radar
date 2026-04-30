@@ -35,13 +35,14 @@ Implementation:
 
 import numpy as np
 import torch
-import sys, os, json
+import sys
+import os
+import json
 sys.path.insert(0, os.path.dirname(__file__))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'baseline'))
 
 from fmcw_simulation import (compute_spectrogram, resize_spectrogram,
                               extract_bfp_features, generate_dataset, RadarParams)
-from model import CNNLSTMClassifier
 from train_and_evaluate import train_cnn_lstm_model, create_sequences, CLASS_NAMES
 
 SEED = int(os.environ.get('ATTACK_SEED', '42'))
@@ -170,7 +171,8 @@ def build_ornithopter_sequences(n_samples, flap_freq, wingspan,
         ws = np.random.uniform(max(0.1, wingspan - 0.1), wingspan + 0.1)
         s, b = generate_ornithopter_sample(ff, ws, v_bulk_lo, v_bulk_hi,
                                             rcs_body_mean=rcs_body_mean)
-        specs.append(s); bfps.append(b)
+        specs.append(s)
+        bfps.append(b)
     specs = np.array(specs, dtype=np.float32)
     bfps = np.array(bfps, dtype=np.float32)
     X_seq = np.array([specs[i:i+seq_len] for i in range(n_samples)])

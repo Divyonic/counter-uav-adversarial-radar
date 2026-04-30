@@ -16,13 +16,14 @@ Outputs:
 
 import numpy as np
 import torch
-import sys, os, json
+import sys
+import os
+import json
 sys.path.insert(0, os.path.dirname(__file__))
 
 from fmcw_simulation import (generate_drone_signal, compute_spectrogram,
                               resize_spectrogram, extract_bfp_features,
-                              generate_dataset, RadarParams)
-from model import CNNLSTMClassifier
+                              generate_dataset)
 from train_and_evaluate import train_cnn_lstm_model, create_sequences, CLASS_NAMES
 
 SEED = int(os.environ.get('ATTACK_SEED', '42'))

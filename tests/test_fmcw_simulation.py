@@ -1,7 +1,6 @@
 """Tests for the FMCW radar simulator and feature extractors."""
 
 import numpy as np
-import pytest
 
 from fmcw_simulation import (
     generate_drone_signal,

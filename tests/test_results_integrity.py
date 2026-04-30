@@ -16,7 +16,6 @@ Either way, the humans have to reconcile before shipping.
 import json
 import os
 
-import pytest
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 

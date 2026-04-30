@@ -17,13 +17,14 @@ Attack variants span glide ratios from 0 (all pulse) to 1 (all glide).
 
 import numpy as np
 import torch
-import sys, os, json
+import sys
+import os
+import json
 sys.path.insert(0, os.path.dirname(__file__))
 
 from fmcw_simulation import (generate_drone_signal, compute_spectrogram,
                               resize_spectrogram, extract_bfp_features,
-                              generate_dataset, RadarParams)
-from model import CNNLSTMClassifier
+                              generate_dataset)
 from train_and_evaluate import train_cnn_lstm_model, create_sequences, CLASS_NAMES
 
 SEED = int(os.environ.get('ATTACK_SEED', '42'))
@@ -66,7 +67,7 @@ def build_clean_dataset_and_train():
     Xs_val, bfps_val, ys_val = create_sequences(X_val, bfp_val, y_val, seq_len=10)
     Xs_te, bfps_te, ys_te = create_sequences(X_te, bfp_te, y_te, seq_len=10)
 
-    print(f"Training CNN+LSTM+BFP baseline...")
+    print("Training CNN+LSTM+BFP baseline...")
     model, best_val = train_cnn_lstm_model(
         Xs_tr, bfps_tr, ys_tr, Xs_val, bfps_val, ys_val, epochs=40)
 
@@ -128,10 +129,12 @@ def build_pulse_glide_sequences(n_samples, glide_ratio, seq_len=10):
         # generate n_pulse + n_glide frames
         for _ in range(n_pulse):
             s, b = generate_pulse_frame()
-            frames_specs.append(s); frames_bfps.append(b)
+            frames_specs.append(s)
+            frames_bfps.append(b)
         for _ in range(n_glide):
             s, b = generate_glide_frame()
-            frames_specs.append(s); frames_bfps.append(b)
+            frames_specs.append(s)
+            frames_bfps.append(b)
         # shuffle the order within the sequence (realistic: drone alternates)
         order = np.random.permutation(seq_len)
         X_seq.append([frames_specs[i] for i in order])

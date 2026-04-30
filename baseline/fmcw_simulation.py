@@ -333,7 +333,6 @@ def generate_dataset(n_samples_per_class=500, snr_db=15, save_dir=None):
 
     for class_id, (name, gen_func, param_fn) in class_configs.items():
         print(f"  Generating {name}...", end=' ', flush=True)
-        import sys
         for _ in range(n_samples_per_class):
             params = param_fn()
             beat_matrix = gen_func(**params)
@@ -372,24 +371,24 @@ if __name__ == '__main__':
     beat = generate_drone_signal(R0=1000, v_bulk=10, snr_db=20)
     t1 = time.time()
     print(f"  Drone signal: {(t1-t0)*1000:.0f} ms")
-    
+
     t0 = time.time()
     beat = generate_bird_signal(R0=600, v_bulk=8, snr_db=20)
     t1 = time.time()
     print(f"  Bird signal: {(t1-t0)*1000:.0f} ms")
-    
+
     t0 = time.time()
     rd_map = compute_range_doppler_map(beat)
     t1 = time.time()
     print(f"  Range-Doppler map: {(t1-t0)*1000:.0f} ms")
-    
+
     t0 = time.time()
     spec, f, t = compute_spectrogram(beat)
     spec_r = resize_spectrogram(spec)
     t1 = time.time()
     print(f"  Spectrogram + resize: {(t1-t0)*1000:.0f} ms")
     print(f"  Spec shape: {spec.shape} -> {spec_r.shape}")
-    
+
     # Estimate dataset gen time
     t0 = time.time()
     for _ in range(10):

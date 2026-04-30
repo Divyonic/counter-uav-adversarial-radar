@@ -26,7 +26,7 @@ the same signature: extract_herm_features(spectrogram, fs_stft) -> np.ndarray
 """
 
 import numpy as np
-from scipy.signal import find_peaks, get_window
+from scipy.signal import get_window
 
 
 def _envelope_spectrum(envelope, fs, pad_to=512):
@@ -166,7 +166,8 @@ def compare_herm_vs_bfp(n_samples_per_class=50, snr_db=15):
     distributions. If HERM discriminates classes but BFP does not, HERM
     is the better feature.
     """
-    import sys, os
+    import sys
+    import os
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
     from fmcw_simulation import (generate_drone_signal, generate_bird_signal,
                                    generate_friendly_uav_signal,

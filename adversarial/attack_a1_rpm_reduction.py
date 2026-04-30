@@ -20,14 +20,15 @@ Hypothesis (informed by A2 ablation):
 
 import numpy as np
 import torch
-import sys, os, json
+import sys
+import os
+import json
 sys.path.insert(0, os.path.dirname(__file__))
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'baseline'))
 
 from fmcw_simulation import (generate_drone_signal, compute_spectrogram,
                               resize_spectrogram, extract_bfp_features,
-                              generate_dataset, RadarParams)
-from model import CNNLSTMClassifier
+                              generate_dataset)
 from train_and_evaluate import train_cnn_lstm_model, create_sequences, CLASS_NAMES
 
 SEED = int(os.environ.get('ATTACK_SEED', '42'))
@@ -102,7 +103,8 @@ def build_low_rpm_sequences(n_samples, rpm, seq_len=10):
     specs, bfps = [], []
     for _ in range(n_samples + seq_len - 1):
         s, b = generate_low_rpm_drone_sample(rpm=rpm)
-        specs.append(s); bfps.append(b)
+        specs.append(s)
+        bfps.append(b)
     specs = np.array(specs, dtype=np.float32)
     bfps = np.array(bfps, dtype=np.float32)
     X_seq = np.array([specs[i:i+seq_len] for i in range(n_samples)])

@@ -25,12 +25,13 @@ Output: results/feature_attribution_results.json with accuracy per test.
 
 import numpy as np
 import torch
-import sys, os, json
+import sys
+import os
+import json
 sys.path.insert(0, os.path.dirname(__file__))
 
 from fmcw_simulation import generate_dataset
-from model import CNNLSTMClassifier
-from train_and_evaluate import train_cnn_lstm_model, create_sequences, CLASS_NAMES
+from train_and_evaluate import train_cnn_lstm_model, create_sequences
 
 SEED = int(os.environ.get('ATTR_SEED', '42'))
 np.random.seed(SEED)

@@ -7,16 +7,16 @@ If LSTM accuracy collapses, the original 95.8% was a synthetic-data artifact.
 """
 import numpy as np
 import torch
-import sys, os, json, time
+import sys
+import os
+import json
 sys.path.insert(0, os.path.dirname(__file__))
 
 from fmcw_simulation import (generate_drone_signal, generate_bird_signal,
                                generate_friendly_uav_signal, generate_aircraft_signal,
                                compute_spectrogram, resize_spectrogram,
                                extract_bfp_features)
-from model import CNNLSTMClassifier, count_parameters
-from sklearn.metrics import accuracy_score, confusion_matrix
-from train_and_evaluate import train_cnn_lstm_model, create_sequences, evaluate_model
+from train_and_evaluate import train_cnn_lstm_model, evaluate_model
 
 np.random.seed(42)
 torch.manual_seed(42)
@@ -207,7 +207,7 @@ def run_leakage_test():
     gap = test_con['accuracy'] - test_rand['accuracy']
     if gap > 0.15:
         print(f"  ⚠️  LEAKAGE DETECTED: {gap*100:.1f} pp drop when parameters randomized.")
-        print(f"      The LSTM is exploiting within-sequence parameter consistency.")
+        print("      The LSTM is exploiting within-sequence parameter consistency.")
     elif gap > 0.05:
         print(f"  ⚠️  PARTIAL LEAKAGE: {gap*100:.1f} pp drop. Some benefit from consistency.")
     else:
@@ -224,7 +224,7 @@ def run_leakage_test():
 
     with open(os.path.join(RESULTS_DIR, 'leakage_test_results.json'), 'w') as f:
         json.dump(results, f, indent=2)
-    print(f"\n  Results saved to results/leakage_test_results.json")
+    print("\n  Results saved to results/leakage_test_results.json")
 
     return results
 
