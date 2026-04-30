@@ -115,6 +115,41 @@ Piecing A2, D2, and attribution together, the simplest hypothesis that fits all 
 
 The "physics-informed CNN + LSTM + BFP" architecture, when trained on this synthetic dataset, behaves like a bulk-Doppler peak locator with a class-prior head. Minus the interpretability that a simpler model would provide.
 
+### Closing the threat taxonomy: A1 and E1
+
+Before designing attribution-driven attacks I wanted to make sure the original null results weren't a quirk of A2 and D2 specifically. The threat taxonomy I sketched at the start had two more attacks against advertised physics: **A1**, a pure-RPM sweep that varies BFP frequency without touching blade count; and **E1**, an "ornithopter" substitution that swaps propeller modulation for biological flapping-wing micro-Doppler while holding bulk kinematics at drone-typical values.
+
+Both produced null results, and both produced them for the reason the attribution predicts. A1 swept RPM from 500 to 6000 with `n_blades=2` fixed, expected BFP fundamentals from 16.7 Hz to 200 Hz; drone classification stayed in the 76–93 percent band, indistinguishable from baseline. The measured BFP feature stayed at 33–44 Hz regardless of expected BFP, reproducing the BFP-noise ablation cleanly on the RPM axis alone.
+
+E1 was the more decisive of the two. Four variants kept bulk velocity in the drone-typical range and substituted bird-style asymmetric flap micro-Doppler for propeller harmonics — drone classification stayed at 83–91 percent. Only the variant that *also* restricted velocity to the bird-overlap range collapsed accuracy, and that variant collapses to D1 (the velocity attack) rather than to E1 itself. The classifier does not notice when propellers are replaced with flapping wings, as long as the bulk-Doppler peak stays in the drone band.
+
+Four nulls across the A-, D-, and E-series of the taxonomy. The architecture's advertised physics is not what the classifier reads, end of story.
+
+### Sharpening the attribution: the class-conditional mask
+
+The two fixed-band masks in the original attribution table (central 25 percent, outer 50 percent) are geometrically confounded — bulk-Doppler energy for different classes lives in different absolute frequency bins. A cleaner test masks ±N bins around *each sample's own* peak-power frequency bin. The result is striking: zeroing **just three bins (±1 bin, 2.3 percent of the frequency axis)** at each sample's peak drops accuracy by 20.8 percentage points — *more* than masking the central 25 percent of the axis with a fixed band did. Bird recall collapses to zero at this notch width.
+
+This is the cleanest demonstration in the repo of the central attribution claim: the classifier is using bulk-Doppler peak position and post-normalisation shape, period. Three bins at the peak destroy nearly half the classifier's accuracy lead.
+
+### The attack that works: D1, bird-speed flight
+
+If the classifier reads bulk-Doppler peak position, the obvious physical attack is to fly the drone at a velocity whose Doppler peak overlaps an adjacent class. The training distribution has drones at 5–20 m/s and birds at 5–15 m/s, with friendly UAV at 15–35 m/s. So the drone class lives in a narrow stripe (~8–15 m/s) where it does not overlap either neighbour. Outside that stripe, the classifier should hand the prediction to whichever class the velocity is more consistent with.
+
+I swept six velocity windows from 3–5 m/s up to 15–20 m/s, holding all other drone parameters at their training-distribution values. Drone classification collapsed in two distinct directions:
+
+- **At v_bulk ≤ 12 m/s the drone reads as a bird.** At 5–10 m/s, drone classification drops to 45 percent; at 3–5 m/s, 78 percent of the fleet is labelled bird.
+- **At v_bulk = 15–20 m/s the drone reads as a friendly UAV.** 149 of 150 samples are labelled UAV — essentially complete confusion. Friendly-coded targets are explicitly *not* engaged by counter-UAV systems.
+
+Both misclassifications require **no hardware modification** — only a flight-controller change. There is no harmonic-content attack here, no propeller modification, no cross-section reduction. The drone simply flies outside the v_bulk band that the classifier associates with "drone." This is the attribution-driven attack working exactly as predicted, and it is the most operationally consequential finding in the project.
+
+### The attack that doesn't work, and why that's also useful: B1
+
+The attribution suggested two attacks: position (D1, succeeded) and amplitude (B1, this one). B1 reduces the drone's effective radar return by 0–20 dB while leaving ambient noise unchanged — the cheapest physical instantiation is a radar-absorbent material wrap. Drone classification stays in the 77–97 percent band across the entire sweep, including effective SNR of −5 dB. Null result.
+
+The reason is upstream of the classifier. `compute_spectrogram` → `resize_spectrogram` does dB clipping to a 40 dB dynamic range and per-sample normalisation to [0, 1], which **discards absolute amplitude before the classifier sees the input**. So the classifier reads peak position and post-normalised relative shape — not absolute received power. B1 attacks a feature the classifier doesn't see, but for a different reason than A2/D2 did. Those targeted physics the architecture *describes* but doesn't compute. B1 targets a feature the architecture *would* read, but the preprocessing layer normalises away before the classifier inputs.
+
+This refines the attribution claim: amplitude-domain physical attacks like RAM wrap defeat the system at the *detection* stage (CFAR / track confirmation), not the classifier stage. They are real attacks; they just live in a different layer of the pipeline. Both the success of D1 and the null of B1 are interpretable, and neither would have been without the prior attribution work.
+
 ### Why this matters
 
 The two physically motivated attacks both produced null results. The initial, comfortable reading was "the classifier is robust." The correct reading is "the attacks were designed against features the classifier does not use." Those are very different conclusions. Without attribution, they are indistinguishable from the accuracy numbers alone.
@@ -154,7 +189,7 @@ Seven experiments organised by what they target in the pipeline. Predicted-null 
 | 7 | **D1** &mdash; bird-speed flight | Bulk-Doppler peak position | **Strong success.** 0% drone at 15–20 m/s (UAV confusion); 21–45% at 3–10 m/s (bird confusion) | 0–45% |
 | 8 | **B1** &mdash; RAM-wrap / amplitude attenuation 0–20 dB | Bulk-Doppler peak amplitude | Null. Preprocessing absorbs amplitude before the classifier | 77–97% |
 
-Three experiments, told in narrative order. Each builds on the previous.
+Eight experiments, told in narrative order. Each builds on the previous.
 
 ### 1. Attack A2 &mdash; blade-count reduction &mdash; *null*
 
@@ -176,19 +211,42 @@ Removing propeller content from the signal itself (not just from the extracted f
 
 Permutation-importance and region-masking tests resolve both nulls. The classifier identifies drones by the position and amplitude of the bulk-Doppler peak, not by harmonic structure. The LSTM is a multi-instance aggregator, not a temporal tracker. BFP is used, but as a class-correlated noise distribution.
 
-A class-conditional refinement (`feature_attribution_class_conditional.py`) sharpens this: zeroing **just ±1 frequency bin (2.3% of the axis) at each sample's own bulk-Doppler peak** drops accuracy by 20.8 pp — more than the original 25%-band fixed mask. Bird recall drops to zero at this notch width.
+![Feature attribution results](paper/figures_preprint/fig5_attr.png)
 
-### 4. Attribution-driven attacks &mdash; one strong success, one informative null
+### 4. Attacks A1 &amp; E1 &mdash; closing the threat taxonomy &mdash; *null*
 
-D1 (bird-speed flight) and B1 (RAM-wrap / RCS reduction) target features attribution identified as load-bearing. **D1 succeeds strongly**: drone-classification accuracy collapses from 88.9% to 0–45% across velocity windows from 3–20 m/s. At 15–20 m/s, drones get classified as friendly UAV (149/150). At 3–10 m/s, drones get classified as bird. **B1 is null**, but for an instructive reason — per-sample dB clipping and [0,1] normalisation in `resize_spectrogram` discards absolute amplitude before the classifier sees the input, so amplitude-domain attacks cannot reach the classifier through the input pathway.
+A1 (pure RPM sweep, 500–6000 RPM with `n_blades=2` fixed) and E1 (ornithopter substitution: drone-scale RCS and drone-scale velocity but bird-style flapping-wing micro-Doppler) both produce nulls. A1 keeps drone classification at 76–93% across the entire RPM sweep — the BFP extractor returns 33–44 Hz regardless of expected BFP from 16.7 to 200 Hz. E1's first four variants stay at 83–91% drone classification; the only succeeding variant restricts velocity to 5–15 m/s and is really D1 in disguise. Together they confirm: **no attack against the architecture's advertised physics moves the classifier**.
 
-A1 (pure RPM reduction) and E1 (ornithopter substitution: drone-scale RCS + drone-scale velocity + bird-style flap micro-Doppler) round out the threat taxonomy with two more nulls confirming that micro-Doppler structure is invisible to this classifier.
+### 5. Class-conditional bulk-Doppler mask &mdash; sharpening the attribution
 
-### 5. Workflow proposal
+Masking ±N bins around *each sample's own* peak-power frequency bin disentangles bulk-Doppler peak dependence from the geometric confound in §3. The result: a 3-bin notch (±1 bin, 2.3% of the axis) drops accuracy by 20.8 pp — more than the fixed central-25% mask did with 10× more masking. Bird recall collapses to zero at this notch width.
+
+![Class-conditional bulk-Doppler mask sweep](paper/figures_preprint/fig7_classcond.png)
+
+### 6. Attack D1 &mdash; bird-speed flight &mdash; ***strong success***
+
+The attribution-driven attack against bulk-Doppler peak *position*. Fly the drone at a velocity whose bulk-Doppler peak overlaps an adjacent class. Drone-classification accuracy collapses from 88.9% baseline to 0–45% across the velocity sweep — and reveals two distinct failure modes:
+
+- At v_bulk = 15–20 m/s, drones are classified as **friendly UAV** (149/150 — essentially complete confusion). Friendly-coded targets are explicitly not engaged.
+- At v_bulk = 3–10 m/s, drones are classified as **bird** (78% confusion at 3–5 m/s). A counter-UAV system that triages by class will likely not engage.
+
+Both require no hardware modification, only a flight-controller change. This is the most operationally consequential finding in the project.
+
+![Attack D1 results](paper/figures_preprint/fig8_d1.png)
+
+### 7. Attack B1 &mdash; RAM-wrap / amplitude reduction &mdash; *informative null*
+
+The attribution-driven attack against bulk-Doppler peak *amplitude*. Reduce the drone's effective radar return by 0–20 dB. Accuracy stays in the 77–97% band across the entire sweep, including −5 dB effective SNR.
+
+The reason: `compute_spectrogram` → `resize_spectrogram` does dB clipping to 40 dB dynamic range and per-sample [0, 1] normalisation, which discards absolute amplitude before the classifier sees the input. The classifier reads peak *position* and *post-normalised* shape — not absolute power. B1 is therefore a CFAR/detection-stage attack, not a classifier-input attack on this pipeline. This sharpens the attribution claim: amplitude-domain attacks live in a different layer of the system.
+
+![Attack B1 results](paper/figures_preprint/fig9_b1.png)
+
+### 8. Workflow proposal
 
 ![Attribution-first workflow](paper/figures_preprint/fig6_workflow.png)
 
-**Before designing an adversarial attack, run feature attribution.** A null result on an attack targeting features the classifier does not use is uninterpretable.
+**Before designing an adversarial attack, run feature attribution.** A null result on an attack targeting features the classifier does not use is uninterpretable. The attack that targets what the classifier *does* use can succeed catastrophically with no hardware modification (D1). Both outcomes are only interpretable when the attribution work comes first.
 
 ---
 
